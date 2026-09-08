@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>SmartHub — заявки</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Google+Sans:opsz,wght@17..18,400..700&subset=latin,cyrillic" rel="stylesheet">
+<style>
+  :root{--ink:#0C0035;--red:#EF0000;--surface:#E8EFF5;--line:#E8EFF5;
+        --text:#0C0035;--text-2:rgba(12,0,53,.62);--text-3:rgba(12,0,53,.45)}
+  *,*::before,*::after{box-sizing:border-box}
+  body{margin:0;background:#fff;color:var(--text);
+       font-family:"Google Sans",Arial,sans-serif;font-size:15px;line-height:1.5}
+  a{color:inherit}
+  .bar{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:16px;
+       padding:14px 24px;background:rgba(255,255,255,.94);backdrop-filter:blur(12px);
+       border-bottom:2px solid var(--line)}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:500;letter-spacing:-.03em;font-size:18px}
+  .brand img{height:30px;width:auto;display:block}
+  .dot{width:8px;height:8px;border-radius:50%;background:#22c55e;flex:0 0 8px}
+  .dot.off{background:var(--text-3)}
+  .muted{color:var(--text-3);font-size:13px;font-weight:300}
+  .grow{margin-left:auto}
+  .btn{height:38px;padding:0 16px;border:1.5px solid var(--line);border-radius:9px;
+       background:#fff;font:inherit;font-size:14px;font-weight:500;cursor:pointer}
+  .btn:hover{border-color:var(--red);color:var(--red)}
+  .btn-primary{background:var(--red);border-color:var(--red);color:#fff}
+  .btn-primary:hover{background:#C40000;color:#fff}
+  .wrap{max-width:1180px;margin:0 auto;padding:26px 24px 60px}
+  .stats{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:20px}
+  .stat{padding:14px 18px;background:var(--surface);border-radius:14px;min-width:120px}
+  .stat b{display:block;font-size:26px;font-weight:500;letter-spacing:-.04em;color:var(--red)}
+  .stat span{font-size:12px;color:var(--text-2)}
+  .filters{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+  .chip{padding:7px 14px;border:1.5px solid var(--line);border-radius:999px;background:#fff;
+        font-size:13px;font-weight:500;cursor:pointer}
+  .chip.on{background:var(--ink);border-color:var(--ink);color:#fff}
+  input[type=search]{flex:1;min-width:180px;height:36px;padding:0 14px;border:1.5px solid var(--line);
+        border-radius:999px;font:inherit;font-size:14px;outline:none}
+  input[type=search]:focus{border-color:var(--red)}
+  table{width:100%;border-collapse:collapse}
+  th,td{padding:13px 12px;text-align:left;vertical-align:top;border-bottom:1.5px solid var(--line)}
+  th{font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:.05em;color:var(--text-3)}
+  td{font-size:14px}
+  tr.fresh{animation:pop 2.4s ease}
+  @keyframes pop{0%{background:rgba(239,0,0,.14)}100%{background:transparent}}
+  .tag{display:inline-block;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:500}
+  .tag.trial{background:rgba(239,0,0,.1);color:var(--red)}
+  .tag.contact{background:var(--surface);color:var(--ink)}
+  .nowrap{white-space:nowrap}
+  .icon-btn{width:30px;height:30px;padding:0;border:1.5px solid var(--line);border-radius:8px;
+       background:#fff;color:var(--text-3);font:inherit;font-size:15px;line-height:1;cursor:pointer}
+  .icon-btn:hover{border-color:var(--red);color:var(--red);background:#fff5f5}
+  td.actions{width:44px;text-align:right}
+  .selbar{display:flex;align-items:center;gap:12px;margin-bottom:14px;padding:11px 16px;
+       background:#FFF4E5;border-radius:11px;font-size:14px}
+  .selbar b{font-weight:500}
+  input[type=checkbox]{width:16px;height:16px;accent-color:var(--red);cursor:pointer}
+  th.pick,td.pick{width:34px}
+  .msg{max-width:340px;color:var(--text-2);font-weight:300}
+  .empty{padding:60px 20px;text-align:center;color:var(--text-3)}
+  .warn{margin-bottom:18px;padding:13px 16px;border-radius:12px;
+        background:#FFF4E5;color:#7A4A00;font-size:13px;line-height:1.5}
+  /* login */
+  .login{max-width:340px;margin:14vh auto;padding:0 24px;text-align:center}
+  .login img{height:44px;margin-bottom:26px}
+  .login input{width:100%;height:46px;padding:0 16px;border:1.5px solid var(--line);
+        border-radius:9px;font:inherit;outline:none;margin-bottom:10px}
+  .login input:focus{border-color:var(--red)}
+  .login .btn{width:100%;height:46px}
+  .err{margin-top:12px;color:var(--red);font-size:13px;min-height:18px}
+  [hidden]{display:none!important}
+</style>
+</head>
+<body>
+
+<div id="loginView" class="login" hidden>
+  <img src="assets/logo.png?v=2" alt="SmartHub">
+  <form id="loginForm">
+    <input type="password" id="pw" placeholder="Пароль администратора" autocomplete="current-password" required>
+    <button class="btn btn-primary" type="submit">Войти</button>
+  </form>
+  <div class="err" id="loginErr"></div>
+</div>
+
+<div id="appView" hidden>
+  <div class="bar">
+    <div class="brand"><img src="assets/logo.png?v=2" alt="SmartHub"> Заявки</div>
+    <span class="dot" id="live"></span>
+    <span class="muted" id="liveText">подключение…</span>
+    <div class="grow"></div>
+    <button class="btn" id="refresh">Обновить</button>
+    <button class="btn" id="csv">Выгрузить CSV</button>
+    <button class="btn" id="logout">Выйти</button>
+  </div>
+
+  <div class="wrap">
+    <div class="warn" id="volatile" hidden>
+      База данных не подключена — заявки держатся только в памяти сервера и пропадут при перезапуске.
+      Задайте переменную окружения DATABASE_URL и передеплойте проект.
+    </div>
+
+    <div class="stats">
+      <div class="stat"><b id="cTotal">0</b><span>всего</span></div>
+      <div class="stat"><b id="cToday">0</b><span>сегодня</span></div>
+      <div class="stat"><b id="cTrial">0</b><span>на пробный урок</span></div>
+      <div class="stat"><b id="cContact">0</b><span>вопросы</span></div>
+    </div>
+
+    <div class="filters">
+      <button class="chip on" data-f="all">Все</button>
+      <button class="chip" data-f="trial">Пробный урок</button>
+      <button class="chip" data-f="contact">Вопросы</button>
+      <input type="search" id="q" placeholder="Поиск по имени, телефону, тексту…">
+    </div>
+
+    <div class="filters">
+      <button class="chip on" data-p="all">За всё время</button>
+      <button class="chip" data-p="today">Сегодня</button>
+      <button class="chip" data-p="7">7 дней</button>
+      <button class="chip" data-p="30">30 дней</button>
+    </div>
+
+    <div class="selbar" id="selbar" hidden>
+      <b id="selCount">0</b> выбрано
+      <button class="btn" id="delSel">Удалить выбранные</button>
+      <button class="btn" id="selClear">Снять выделение</button>
+    </div>
+
+    <table>
+      <thead><tr>
+        <th class="pick"><input type="checkbox" id="pickAll" title="Выбрать все"></th>
+        <th class="nowrap">Когда</th><th>Тип</th><th>Имя</th><th>Телефон</th>
+        <th>Почта</th><th>Программа</th><th>Сообщение</th><th class="actions"></th>
+      </tr></thead>
+      <tbody id="rows"></tbody>
+    </table>
+    <div class="empty" id="empty" hidden>Заявок пока нет.</div>
+  </div>
+</div>
+
+<script>
+(function () {
+  var loginView = document.getElementById('loginView');
+  var appView = document.getElementById('appView');
+  var leads = [], seen = new Set(), filter = 'all', period = 'all', query = '';
+  var picked = new Set(), timer = null, firstLoad = true;
+
+  function show(authed) {
+    loginView.hidden = authed;
+    appView.hidden = !authed;
+    if (authed) { load(); start(); } else { stop(); }
+  }
+
+  /* ── auth ── */
+  fetch('/api/login').then(r => r.json()).then(d => show(!!d.authed)).catch(() => show(false));
+
+  document.getElementById('loginForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var err = document.getElementById('loginErr');
+    err.textContent = '';
+    fetch('/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: document.getElementById('pw').value })
+    })
+      .then(r => r.json().then(d => ({ s: r.status, d: d })))
+      .then(function (x) {
+        if (x.d.ok) { document.getElementById('pw').value = ''; show(true); return; }
+        err.textContent = x.s === 429 ? 'Слишком много попыток. Подождите 15 минут.'
+          : x.d.error === 'admin_password_not_set' ? 'На сервере не задан ADMIN_PASSWORD.'
+          : 'Неверный пароль.';
+      })
+      .catch(() => { err.textContent = 'Сервер недоступен.'; });
+  });
+
+  document.getElementById('logout').addEventListener('click', function () {
+    fetch('/api/login', { method: 'DELETE' }).then(() => show(false));
+  });
+
+  /* ── polling ── */
+  function start() { stop(); timer = setInterval(load, 7000); }
+  function stop() { if (timer) clearInterval(timer); timer = null; }
+  document.addEventListener('visibilitychange', function () {
+    if (appView.hidden) return;
+    if (document.hidden) stop(); else { load(); start(); }
+  });
+
+  function setLive(ok, text) {
+    document.getElementById('live').className = 'dot' + (ok ? '' : ' off');
+    document.getElementById('liveText').textContent = text;
+  }
+
+  function load() {
+    fetch('/api/leads?limit=500', { headers: { 'Accept': 'application/json' } })
+      .then(function (r) {
+        if (r.status === 401) { show(false); throw new Error('unauth'); }
+        return r.json();
+      })
+      .then(function (d) {
+        if (!d.ok) throw new Error(d.error || 'failed');
+        leads = d.leads || [];
+        document.getElementById('volatile').hidden = d.persistent !== false;
+        setLive(true, 'обновлено ' + new Date().toLocaleTimeString('ru-RU'));
+        render();
+      })
+      .catch(function (e) { if (e.message !== 'unauth') setLive(false, 'нет связи с сервером'); });
+  }
+
+  document.getElementById('refresh').addEventListener('click', load);
+
+  /* ── filters ── */
+  // two independent chip groups: highlight only within the clicked row
+  [].forEach.call(document.querySelectorAll('.chip'), function (c) {
+    c.addEventListener('click', function () {
+      var group = c.parentNode.querySelectorAll('.chip');
+      [].forEach.call(group, function (x) { x.classList.remove('on'); });
+      c.classList.add('on');
+      if (c.hasAttribute('data-f')) filter = c.getAttribute('data-f');
+      else period = c.getAttribute('data-p');
+      render();
+    });
+  });
+  document.getElementById('q').addEventListener('input', function (e) {
+    query = e.target.value.toLowerCase().trim();
+    render();
+  });
+
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+
+  function inPeriod(l) {
+    if (period === 'all') return true;
+    var t = new Date(l.at).getTime();
+    if (period === 'today') return new Date(l.at).toDateString() === new Date().toDateString();
+    return t >= Date.now() - Number(period) * 86400000;
+  }
+
+  function visible() {
+    return leads.filter(function (l) {
+      if (filter !== 'all' && l.type !== filter) return false;
+      if (!inPeriod(l)) return false;
+      if (!query) return true;
+      return [l.name, l.phone, l.email, l.program, l.message]
+        .join(' ').toLowerCase().indexOf(query) !== -1;
+    });
+  }
+
+  /* ── deletion ── */
+  function removeLeads(ids, label) {
+    if (!ids.length) return;
+    if (!confirm('Удалить ' + label + '? Действие необратимо.')) return;
+    fetch('/api/leads?id=' + encodeURIComponent(ids.join(',')), { method: 'DELETE' })
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        if (!d.ok) throw new Error(d.error || 'failed');
+        ids.forEach(function (id) { picked.delete(id); });
+        load();
+      })
+      .catch(function () { alert('Не удалось удалить. Обновите страницу и попробуйте снова.'); });
+  }
+
+  document.getElementById('delSel').addEventListener('click', function () {
+    var ids = Array.from(picked);
+    removeLeads(ids, ids.length + ' заявк(и)');
+  });
+  document.getElementById('selClear').addEventListener('click', function () {
+    picked.clear(); render();
+  });
+  document.getElementById('pickAll').addEventListener('change', function (e) {
+    if (e.target.checked) visible().forEach(function (l) { picked.add(l.id); });
+    else picked.clear();
+    render();
+  });
+
+  // rows are re-rendered on every poll, so bind once on the tbody
+  document.getElementById('rows').addEventListener('click', function (e) {
+    var del = e.target.closest('[data-del]');
+    if (del) return removeLeads([del.getAttribute('data-del')], 'эту заявку');
+  });
+  document.getElementById('rows').addEventListener('change', function (e) {
+    if (e.target.type !== 'checkbox') return;
+    var id = e.target.getAttribute('data-pick');
+    e.target.checked ? picked.add(id) : picked.delete(id);
+    syncSelBar();
+  });
+
+  function syncSelBar() {
+    document.getElementById('selCount').textContent = picked.size;
+    document.getElementById('selbar').hidden = picked.size === 0;
+  }
+
+  function render() {
+    var today = new Date().toDateString();
+    document.getElementById('cTotal').textContent = leads.length;
+    document.getElementById('cToday').textContent =
+      leads.filter(function (l) { return new Date(l.at).toDateString() === today; }).length;
+    document.getElementById('cTrial').textContent = leads.filter(function (l) { return l.type === 'trial'; }).length;
+    document.getElementById('cContact').textContent = leads.filter(function (l) { return l.type === 'contact'; }).length;
+
+    var list = visible();
+    document.getElementById('empty').hidden = list.length > 0;
+    document.getElementById('rows').innerHTML = list.map(function (l) {
+      var isNew = !firstLoad && !seen.has(l.id);
+      var d = new Date(l.at);
+      return '<tr class="' + (isNew ? 'fresh' : '') + '">' +
+        '<td class="pick"><input type="checkbox" data-pick="' + esc(l.id) + '"' +
+          (picked.has(l.id) ? ' checked' : '') + '></td>' +
+        '<td class="nowrap muted">' + esc(d.toLocaleDateString('ru-RU')) + '<br>' +
+          esc(d.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })) + '</td>' +
+        '<td><span class="tag ' + (l.type === 'contact' ? 'contact' : 'trial') + '">' +
+          (l.type === 'contact' ? 'Вопрос' : 'Пробный') + '</span></td>' +
+        '<td>' + esc(l.name) + '</td>' +
+        '<td class="nowrap"><a href="tel:' + esc(l.phone) + '">' + esc(l.phone) + '</a></td>' +
+        '<td>' + (l.email ? '<a href="mailto:' + esc(l.email) + '">' + esc(l.email) + '</a>' : '—') + '</td>' +
+        '<td>' + esc(l.program || '—') + '</td>' +
+        '<td class="msg">' + esc(l.message || '') + '</td>' +
+        '<td class="actions"><button class="icon-btn" data-del="' + esc(l.id) +
+          '" title="Удалить заявку">&times;</button></td>' +
+      '</tr>';
+    }).join('');
+
+    // drop selections whose rows no longer exist
+    var alive = new Set(leads.map(function (l) { return l.id; }));
+    Array.from(picked).forEach(function (id) { if (!alive.has(id)) picked.delete(id); });
+    syncSelBar();
+    document.getElementById('pickAll').checked =
+      list.length > 0 && list.every(function (l) { return picked.has(l.id); });
+
+    leads.forEach(function (l) { seen.add(l.id); });
+    firstLoad = false;
+  }
+
+  /* ── export ── */
+  document.getElementById('csv').addEventListener('click', function () {
+    var cols = ['at', 'type', 'name', 'phone', 'email', 'program', 'message'];
+    var rows = [cols.join(';')].concat(visible().map(function (l) {
+      return cols.map(function (c) { return '"' + String(l[c] == null ? '' : l[c]).replace(/"/g, '""') + '"'; }).join(';');
+    }));
+    // BOM so Excel opens the Cyrillic correctly
+    var blob = new Blob(['﻿' + rows.join('\r\n')], { type: 'text/csv;charset=utf-8' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'smarthub-leads-' + new Date().toISOString().slice(0, 10) + '.csv';
+    a.click();
+    URL.revokeObjectURL(a.href);
+  });
+})();
+</script>
+</body>
+</html>

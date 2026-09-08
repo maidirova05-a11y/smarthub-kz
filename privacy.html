@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Политика конфиденциальности — SmartHub</title>
+<meta name="description" content="Какие данные SmartHub получает через формы на сайте, зачем они нужны, кому передаются и как их удалить.">
+<link rel="canonical" href="https://smarthub-kz.com/privacy">
+<meta name="robots" content="index, follow">
+<link rel="icon" href="/assets/favicon.ico?v=3" sizes="any">
+<link rel="icon" href="/assets/favicon.png?v=3" type="image/png" sizes="512x512">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png?v=3">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Google+Sans:opsz,wght@17..18,400..700&subset=latin,cyrillic" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0C0035; --red:#EF0000; --red-2:#FF5A5A;
+    --surface:#E8EFF5; --surface-2:#F3F7FA; --line:#E8EFF5;
+    --line-dark:rgba(255,255,255,.14);
+    --text:#0C0035; --text-2:rgba(12,0,53,.66); --text-3:rgba(12,0,53,.45);
+    --on-dark:#fff; --on-dark-2:rgba(255,255,255,.68); --on-dark-3:rgba(255,255,255,.42);
+    --r-xl:40px; --r-lg:30px; --r-sm:10px; --r-pill:3000px;
+  }
+  *,*::before,*::after{box-sizing:border-box}
+  html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+  body{margin:0;background:#fff;color:var(--text);
+       font-family:"Google Sans",Arial,Helvetica,sans-serif;
+       font-size:16px;font-weight:400;line-height:1.62;
+       -webkit-font-smoothing:antialiased;overflow-x:hidden}
+  a{color:var(--red);text-decoration:none}
+  a:hover{text-decoration:underline}
+  img{display:block;max-width:100%}
+  ul{margin:0 0 14px;padding-left:0;list-style:none}
+  [hidden]{display:none!important}
+
+  /* ── шапка ── */
+  .nav{position:fixed;top:0;left:0;right:0;z-index:50;padding:12px 0}
+  .container{width:100%;max-width:1265px;margin:0 auto;padding:0 32px}
+  .nav-pill{display:flex;align-items:center;gap:18px;height:60px;padding:0 12px 0 20px;
+            background:rgba(255,255,255,.93);backdrop-filter:saturate(180%) blur(14px);
+            border:2px solid var(--line);border-radius:16px}
+  .nav-pill img{height:28px;width:auto}
+  .nav-right{display:flex;align-items:center;gap:10px;margin-left:auto}
+  .lang{display:flex;gap:2px;padding:3px;border-radius:var(--r-sm);background:var(--surface)}
+  .lang button{padding:5px 10px;border:0;border-radius:7px;background:transparent;
+               font:inherit;font-size:12px;font-weight:500;letter-spacing:.02em;
+               color:var(--text-3);cursor:pointer;transition:.18s}
+  .lang button.on{background:#fff;color:var(--ink)}
+  .back{display:inline-flex;align-items:center;height:38px;padding:0 16px;
+        border-radius:var(--r-sm);background:var(--red);color:#fff;
+        font-size:14px;font-weight:500;white-space:nowrap}
+  .back:hover{background:#C40000;text-decoration:none}
+
+  /* ── тёмный заголовочный блок ── */
+  .head{position:relative;overflow:hidden;background:var(--ink);color:var(--on-dark);
+        padding:150px 0 76px;border-radius:0 0 var(--r-xl) var(--r-xl)}
+  .head::before{content:"";position:absolute;inset:0;
+        background-image:linear-gradient(var(--line-dark) 1px,transparent 1px),
+                         linear-gradient(90deg,var(--line-dark) 1px,transparent 1px);
+        background-size:64px 64px;opacity:.5;
+        -webkit-mask-image:radial-gradient(70% 70% at 70% 20%,#000,transparent);
+        mask-image:radial-gradient(70% 70% at 70% 20%,#000,transparent)}
+  .head::after{content:"";position:absolute;top:-30%;right:-10%;width:640px;height:640px;
+        background:radial-gradient(closest-side,rgba(239,0,0,.42),transparent 72%);pointer-events:none}
+  .head .container{position:relative;z-index:1}
+  .tag{display:inline-flex;align-items:center;gap:8px;height:30px;padding:0 14px;
+       margin-bottom:22px;border-radius:var(--r-pill);background:rgba(255,255,255,.09);
+       color:var(--red-2);font-size:12px;font-weight:500;letter-spacing:.02em;text-transform:uppercase}
+  .tag::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--red-2)}
+  h1{margin:0;font-size:clamp(32px,5.4vw,55px);font-weight:500;
+     letter-spacing:-.055em;line-height:1.02;max-width:15ch}
+  .lead{margin:20px 0 0;max-width:56ch;font-size:17px;font-weight:300;color:var(--on-dark-2)}
+  .updated{margin:26px 0 0;font-size:13px;color:var(--on-dark-3)}
+
+  /* ── текст ── */
+  .wrap{max-width:812px;margin:0 auto;padding:64px 32px 90px}
+  section{margin-bottom:40px}
+  .h2{display:flex;gap:14px;align-items:baseline;margin:0 0 12px}
+  .num{flex:0 0 auto;font-size:14px;font-weight:500;color:var(--red);letter-spacing:.04em}
+  h2{margin:0;font-size:clamp(20px,2.5vw,26px);font-weight:500;
+     letter-spacing:-.045em;line-height:1.18}
+  p{margin:0 0 13px;color:var(--text-2)}
+  strong{color:var(--text);font-weight:500}
+  .list li{position:relative;margin-bottom:9px;padding-left:22px;color:var(--text-2)}
+  .list li::before{content:"";position:absolute;left:0;top:.62em;width:7px;height:7px;
+       border-radius:50%;background:var(--red);opacity:.85}
+
+  .panel{margin:18px 0;padding:26px 30px;background:var(--surface-2);
+         border:2px solid var(--line);border-radius:var(--r-lg)}
+  .panel p{margin:0 0 6px}
+  .panel p:last-child{margin:0}
+  .panel .who{color:var(--text);font-weight:500;font-size:17px;letter-spacing:-.02em}
+
+  /* ── подвал ── */
+  footer{padding:44px 0 34px;background:var(--ink);color:var(--on-dark-3);
+         border-radius:var(--r-xl) var(--r-xl) 0 0;font-size:14px}
+  .foot-in{display:flex;flex-wrap:wrap;align-items:center;gap:12px 20px}
+  footer img{height:26px;width:auto;opacity:.9}
+  footer a{color:rgba(255,255,255,.8)}
+  .foot-in .right{margin-left:auto}
+
+  @media(max-width:820px){
+    .head{padding:126px 0 56px;border-radius:0 0 28px 28px}
+    .wrap{padding:44px 22px 64px}
+    .container{padding:0 20px}
+    .nav-pill{height:54px;padding:0 8px 0 14px;gap:10px}
+    .nav-pill img{height:24px}
+    .back{height:34px;padding:0 12px;font-size:13px}
+    footer{border-radius:28px 28px 0 0}
+    .panel{padding:22px}
+    .h2{gap:10px}
+  }
+  @media(max-width:420px){ .lang{display:none} }
+</style>
+</head>
+<body>
+
+<div class="nav">
+  <div class="container">
+    <div class="nav-pill">
+      <a href="/"><img src="/assets/logo.png?v=2" alt="SmartHub Robotics &amp; Drone Academy"></a>
+      <div class="nav-right">
+        <div class="lang">
+          <button data-set="ru" class="on">RU</button>
+          <button data-set="en">EN</button>
+          <button data-set="kz">KZ</button>
+        </div>
+        <a class="back" href="/"><span data-t="back">На главную</span></a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="head">
+  <div class="container">
+    <div class="tag" data-t="tag">Правовая информация</div>
+    <h1 data-t="title">Политика конфиденциальности</h1>
+    <p class="lead" data-t="lead">Коротко и по существу: какие данные мы получаем через формы на сайте, зачем они нужны, кому передаются и как их удалить.</p>
+    <p class="updated" data-t="updated">Редакция от 8 августа 2026 года</p>
+  </div>
+</div>
+
+<div class="wrap">
+
+<!-- ══════════════ РУССКИЙ ══════════════ -->
+<div class="doc" data-doc="ru">
+
+  <section>
+    <div class="h2"><span class="num">01</span><h2>Общие положения</h2></div>
+    <p>Здесь изложено, как Академия робототехники и дронов SmartHub (далее — «мы») поступает с персональными данными, которые попадают к нам с сайта smarthub-kz.com: что именно мы получаем, ради чего храним и какими мерами оберегаем.</p>
+    <p>Отправляя форму, вы отмечаете согласие на обработку персональных данных. Без этой отметки заявка не отправляется — согласие фиксируется вместе с датой и временем.</p>
+  </section>
+
+  <section>
+    <div class="h2"><span class="num">02</span><h2>Какие данные мы собираем</h2></div>
+    <p>Только то, без чего невозможно с вами связаться и подобрать программу:</p>
+    <ul class="list">
+      <li>имя;</li>
+      <li>номер телефона;</li>
+      <li>адрес электронной почты — в форме «Напишите нам»;</li>
+      <li>интересующая программа или направление;</li>
+      <li>текст вашего сообщения — если вы его написали.</li>
+    </ul>
+    <p>Вместе с заявкой сервер сохраняет техническую информацию: дату отправки, язык сайта, адрес страницы, строку браузера и <strong>обезличенный отпечаток IP-адреса</strong>. Сам адрес мы у себя не держим: он тут же превращается в короткую строку-слепок, из которой исходный номер восстановить нельзя. Нужна она ровно для одного — отличать поток спама от живых заявок.</p>
+    <p>Ничего сверх этого мы не запрашиваем: ни реквизитов карт, ни документов, ни домашнего адреса. Определением местоположения и рекламной слежкой сайт не занимается.</p>
+  </section>
+
+  <section>
+    <div class="h2"><span class="num">03</span><h2>Зачем они нужны</h2></div>
+    <ul class="list">
+      <li>перезвонить вам и согласовать время пробного урока;</li>
+      <li>ответить на вопрос о программах, расписании и стоимости;</li>
+      <li>подобрать направление по возрасту и уровню подготовки;</li>
+      <li>вести внутренний учёт обращений, чтобы не переспрашивать одно и то же.</li>
+    </ul>
+    <p>Для рекламных рассылок данные не используются — на это нужно ваше отдельное согласие.</p>
+  </section>
+
+  <section>
+    <div class="h2"><span class="num">04</span><h2>Кому мы показываем ваши данные</h2></div>
+    <p>Торговля персональными данными и передача их рекламным площадкам исключены.</p>
+    <p>Заявку видят лишь те подрядчики, без которых сайт не заработает: площадка размещения, хранилище записей и система учёта обращений. Каждый получает ровно тот минимум, что нужен для его задачи, и связан обязательством о неразглашении. Помимо этого данные могут быть раскрыты уполномоченным государственным органам — но только по мотивированному требованию и в рамках, очерченных законом.</p>
+  </section>
+
+  <section>
+    <div class="h2"><span class="num">05</span><h2>Внешние сервисы</h2></div>
+    <p>Страницы сайта подгружают шрифты и карту филиалов со сторонних серверов. При такой загрузке браузер по техническим причинам сообщает им IP-адрес и тип устройства — так работает любой сайт с внешними ресурсами. Ваше имя, телефон и содержание заявки этим сервисам не передаются.</p>
+  </section>
+
+  <section>
+    <div class="h2"><span class="num">06</span><h2>Файлы cookie</h2></div>
+    <p>Ни рекламных, ни аналитических cookie у нас не заведено. Счётчиков посещаемости и следящих пикселей на страницах тоже нет.</p>
+    <p>Единственный технический cookie создаётся при входе сотрудника в закрытую панель учёта заявок. Обычному посетителю он не устанавливается. Выбранный язык интерфейса сохраняется в памяти вашего браузера и на сервер не отправляется.</p>
+  </section>
+
+  <section>
+    <div class="h2"><span class="num">07</span><h2>Сколько времени мы всё это держим</h2></div>
+    <p>Заявка живёт у нас ровно столько, сколько требуется, чтобы довести общение с вами до конца и сохранить историю обращения. Захотите стереть её раньше — напишите, и мы это сделаем.</p>
+  </section>
+
+  <section>
+    <div class="h2"><span class="num">08</span><h2>Данные детей</h2></div>
+    <p>Формы сайта предназначены для родителей и законных представителей — мы запрашиваем контакты взрослого, а не ребёнка.</p>
+    <p>Пожалуйста, не указывайте в поле «Сообщение» сведения о здоровье ребёнка и его документах. Возраст и уровень подготовки уточняются при записи на пробный урок.</p>
+  </section>
+
+  <section>
+    <div class="h2"><span class="num">09</span><h2>Чем защищены ваши данные</h2></div>
+    <ul class="list">
+      <li>соединение с сайтом шифруется — работает протокол HTTPS;</li>
+      <li>содержимое полей формы дважды проходит проверку: сперва в браузере, затем на сервере;</li>
+      <li>к хранилищу заявок допущены только сотрудники Академии, вход защищён паролем;</li>
+      <li>от IP-адреса остаётся лишь обезличенный отпечаток;</li>
+      <li>ключи доступа вынесены за пределы кода сайта;</li>
+      <li>частота отправок ограничена, поэтому рассылать через форму спам бесполезно.</li>
+    </ul>
+    <p>Стопроцентной гарантии не существует ни у кого. Если произойдёт утечка, способная задеть ваши интересы, мы сообщим об этом и вам, и уполномоченному органу — так, как предписывает закон.</p>
+  </section>
+
+  <section>
+    <div class="h2"><span class="num">10</span><h2>Что вы можете потребовать</h2></div>
+    <p>В любой день вы вправе спросить, какими сведениями о вас мы располагаем, настоять на их уточнении или полном стирании, а также забрать назад ранее данное согласие. Отзыв действует на будущее: обработка, которая шла до него, остаётся законной.</p>
+    <p>Для этого достаточно написать или позвонить — контакты в конце страницы.</p>
+  </section>
+
+  <section>
+    <div class="h2"><span class="num">11</span><h2>Обновления документа</h2></div>
+    <p>Со временем текст может меняться. Свежая редакция всегда лежит по этому же адресу, а её дата стоит в самом верху.</p>
+  </section>
+
+  <section>
+    <div class="h2"><span class="num">12</span><h2>Контакты</h2></div>
+    <div class="panel">
+      <p class="who">Академия робототехники и дронов SmartHub</p>
+      <p>Электронная почта: <a href="mailto:info@smarthub.kz">info@smarthub.kz</a></p>
+      <p>Телефон: <a href="tel:+77003575949">+7 700 357 59 49</a></p>
+      <p>Астана, Казахстан</p>
+    </div>
+  </section>
+
+</div>
+
+<!-- ══════════════ ENGLISH ══════════════ -->
+<div class="doc" data-doc="en" hidden>
+
+  <section>
+    <div class="h2"><span class="num">01</span><h2>General</h2></div>
+    <p>This page sets out how SmartHub Robotics &amp; Drone Academy (“we”) handles the personal data that reaches us through smarthub-kz.com: what exactly we receive, why we keep it and how we look after it.</p>
+    <p>When you submit a form you tick a box giving consent to the processing of your personal data. Without that tick the form will not send, and the consent is recorded together with its date and time.</p>
+  </section>
+
+  <section>
+    <div class="h2"><span class="num">02</span><h2>What we collect</h2></div>
+    <p>Only what we genuinely need in order to reach you and suggest the right course:</p>
+    <ul class="list">
+      <li>your name;</li>
+      <li>your phone number;</li>
+      <li>your email address — in the “Write to us” form;</li>
+      <li>the programme or track you are interested in;</li>
+      <li>the text of your message, if you wrote one.</li>
+    </ul>
+    <p>Alongside the enquiry the server keeps some technical detail: the time it was sent, the site language, the page address, your browser string and an <strong>anonymised fingerprint of your IP address</strong>. We do not keep the address itself — it is immediately turned into a short digest from which the original number cannot be recovered. That digest serves exactly one purpose: telling spam traffic apart from real enquiries.</p>
+    <p>We ask for nothing beyond this — no card details, no identity documents, no home address. The site does not determine your location and runs no advertising trackers.</p>
+  </section>
+
+  <section>
+    <div class="h2"><span class="num">03</span><h2>Why we need it</h2></div>
+    <ul class="list">
+      <li>to call you back and agree a time for the trial lesson;</li>
+      <li>to answer your questions about programmes, timetable and fees;</li>
+      <li>to match a track to your child's age and level;</li>
+      <li>to keep an internal record of enquiries so we do not ask you the same thing twice.</li>
+    </ul>
+    <p>Your data is not used for marketing mailouts — that would require your separate consent.</p>
+  </section>
+
+  <section>
+    <div class="h2"><span class="num">04</span><h2>Who else sees your data</h2></div>
+    <p>Selling personal data or passing it to advertising networks is ruled out.</p>
+    <p>Your enquiry is seen only by the contractors without whom the site could not run: the hosting platform, the record storage and the enquiry-management system. Each receives precisely the minimum its job requires and is bound by confidentiality. Beyond that, data may be disclosed to authorised state bodies — but only on a reasoned request and within the limits the law sets.</p>
+  </section>
+
+  <section>
+    <div class="h2"><span class="num">05</span><h2>External services</h2></div>
+    <p>The site loads fonts and the branch map from third-party servers. During that load your browser necessarily tells them your IP address and device type — this is how any site with external resources works. Your name, phone number and the content of your enquiry are not passed to those services.</p>
+  </section>
+
+  <section>
+    <div class="h2"><span class="num">06</span><h2>Cookies</h2></div>
+    <p>We have set up no advertising or analytics cookies. There are no visitor counters or tracking pixels on these pages.</p>
+    <p>The only technical cookie is created when a member of staff signs in to the closed enquiry panel. It is never set for an ordinary visitor. Your chosen interface language is stored in your own browser and never sent to the server.</p>
+  </section>
+
+  <section>
+    <div class="h2"><span class="num">07</span><h2>How long we keep it</h2></div>
+    <p>An enquiry stays with us for exactly as long as it takes to finish the conversation with you and preserve the record of it. If you would like it erased sooner, write to us and we will do so.</p>
+  </section>
+
+  <section>
+    <div class="h2"><span class="num">08</span><h2>Children's data</h2></div>
+    <p>The forms on this site are meant for parents and legal guardians — we ask for an adult's contact details, not a child's.</p>
+    <p>Please do not put details of a child's health or identity documents in the “Message” field. Age and level are established when the trial lesson is booked.</p>
+  </section>
+
+  <section>
+    <div class="h2"><span class="num">09</span><h2>How your data is protected</h2></div>
+    <ul class="list">
+      <li>the connection to the site is encrypted — HTTPS is in force;</li>
+      <li>form field contents are checked twice: first in the browser, then on the server;</li>
+      <li>only Academy staff may reach the enquiry store, and entry is password-protected;</li>
+      <li>nothing remains of your IP address but an anonymised fingerprint;</li>
+      <li>access keys are held outside the site's code;</li>
+      <li>submission frequency is capped, so the form is useless for sending spam.</li>
+    </ul>
+    <p>No one can offer a hundred-per-cent guarantee. Should a breach occur that could affect your interests, we will inform both you and the authorised body, in the manner the law prescribes.</p>
+  </section>
+
+  <section>
+    <div class="h2"><span class="num">10</span><h2>What you can ask of us</h2></div>
+    <p>On any day you may ask what information about you we hold, insist that it be corrected or wiped entirely, and withdraw consent you gave earlier. Withdrawal takes effect going forward: processing carried out before it remains lawful.</p>
+    <p>A message or a phone call is enough — the contacts are at the foot of this page.</p>
+  </section>
+
+  <section>
+    <div class="h2"><span class="num">11</span><h2>Updates to this document</h2></div>
+    <p>The wording may change over time. The current version always sits at this same address, with its date shown at the top.</p>
+  </section>
+
+  <section>
+    <div class="h2"><span class="num">12</span><h2>Contacts</h2></div>
+    <div class="panel">
+      <p class="who">SmartHub Robotics &amp; Drone Academy</p>
+      <p>Email: <a href="mailto:info@smarthub.kz">info@smarthub.kz</a></p>
+      <p>Phone: <a href="tel:+77003575949">+7 700 357 59 49</a></p>
+      <p>Astana, Kazakhstan</p>
+    </div>
+  </section>
+
+</div>
+
+<!-- ══════════════ ҚАЗАҚША ══════════════ -->
+<div class="doc" data-doc="kz" hidden>
+
+  <section>
+    <div class="h2"><span class="num">01</span><h2>Жалпы ережелер</h2></div>
+    <p>Бұл бетте SmartHub робототехника және дрон академиясы (бұдан әрі — «біз») smarthub-kz.com сайты арқылы бізге жететін дербес деректермен қалай жұмыс істейтіні жазылған: нақты нені аламыз, не үшін сақтаймыз және қалай қорғаймыз.</p>
+    <p>Форманы жібергенде сіз дербес деректерді өңдеуге келісім белгісін қоясыз. Ол белгісіз өтінім жіберілмейді, ал келісім күні мен уақытымен бірге тіркеледі.</p>
+  </section>
+
+  <section>
+    <div class="h2"><span class="num">02</span><h2>Қандай деректерді жинаймыз</h2></div>
+    <p>Сізбен байланысу және бағдарлама таңдау үшін шынымен қажет нәрсе ғана:</p>
+    <ul class="list">
+      <li>атыңыз;</li>
+      <li>телефон нөміріңіз;</li>
+      <li>электрондық пошта — «Бізге жазыңыз» формасында;</li>
+      <li>қызықтырған бағдарлама немесе бағыт;</li>
+      <li>хабарламаңыздың мәтіні — жазған болсаңыз.</li>
+    </ul>
+    <p>Өтініммен бірге сервер техникалық мәліметті сақтайды: жіберілген уақыт, сайт тілі, бет мекенжайы, браузер жолы және <strong>IP-мекенжайдың дербестендірілмеген таңбасы</strong>. Мекенжайдың өзін сақтамаймыз: ол бірден қысқа жолға айналады, одан бастапқы нөмірді қалпына келтіру мүмкін емес. Ол тек бір нәрсеге керек — спам ағынын нағыз өтінімдерден ажырату үшін.</p>
+    <p>Бұдан артық ештеңе сұрамаймыз: не карта деректері, не құжаттар, не тұрғылықты мекенжай. Сайт орналасқан жерді анықтамайды және жарнамалық бақылау жүргізбейді.</p>
+  </section>
+
+  <section>
+    <div class="h2"><span class="num">03</span><h2>Не үшін қажет</h2></div>
+    <ul class="list">
+      <li>сізге қайта қоңырау шалып, сынақ сабағының уақытын келісу үшін;</li>
+      <li>бағдарламалар, кесте және құны туралы сұраққа жауап беру үшін;</li>
+      <li>баланың жасы мен дайындық деңгейіне қарай бағыт таңдау үшін;</li>
+      <li>өтінімдердің ішкі есебін жүргізіп, бір нәрсені екі рет сұрамау үшін.</li>
+    </ul>
+    <p>Деректер жарнамалық таратылымға пайдаланылмайды — ол үшін сіздің бөлек келісіміңіз керек.</p>
+  </section>
+
+  <section>
+    <div class="h2"><span class="num">04</span><h2>Деректеріңізді кім көреді</h2></div>
+    <p>Дербес деректерді сату және оларды жарнама алаңдарына беру мүлдем жоққа шығарылады.</p>
+    <p>Өтінімді сайт жұмысы мүмкін болмайтын мердігерлер ғана көреді: орналастыру алаңы, жазбалар қоймасы және өтінімдерді есепке алу жүйесі. Әрқайсысы өз міндетіне қажет ең аз көлемді ғана алады және құпиялылық міндетімен байланысты. Бұдан бөлек, деректер уәкілетті мемлекеттік органдарға ашылуы мүмкін — бірақ тек дәлелді талап бойынша және заң белгілеген шеңберде.</p>
+  </section>
+
+  <section>
+    <div class="h2"><span class="num">05</span><h2>Сыртқы қызметтер</h2></div>
+    <p>Сайт беттері қаріптер мен филиалдар картасын сырттағы серверлерден жүктейді. Мұндай жүктеу кезінде браузер техникалық себеппен оларға IP-мекенжай мен құрылғы түрін хабарлайды — сыртқы ресурстары бар кез келген сайт солай жұмыс істейді. Атыңыз, телефоныңыз және өтінім мазмұны бұл қызметтерге берілмейді.</p>
+  </section>
+
+  <section>
+    <div class="h2"><span class="num">06</span><h2>Cookie файлдары</h2></div>
+    <p>Бізде жарнамалық та, талдамалық та cookie жоқ. Беттерде келушілер санауыштары мен бақылау пиксельдері де жоқ.</p>
+    <p>Жалғыз техникалық cookie қызметкер өтінімдер панеліне кіргенде ғана жасалады. Қарапайым келушіге ол орнатылмайды. Таңдалған тіл сіздің браузеріңіздің жадында сақталады және серверге жіберілмейді.</p>
+  </section>
+
+  <section>
+    <div class="h2"><span class="num">07</span><h2>Қанша уақыт сақтаймыз</h2></div>
+    <p>Өтінім бізде сізбен әңгімені аяқтауға және оның тарихын сақтауға қанша қажет болса, сонша тұрады. Ертерек өшіргіңіз келсе — жазыңыз, біз солай істейміз.</p>
+  </section>
+
+  <section>
+    <div class="h2"><span class="num">08</span><h2>Балалардың деректері</h2></div>
+    <p>Сайттағы формалар ата-аналар мен заңды өкілдерге арналған — біз баланың емес, ересек адамның байланысын сұраймыз.</p>
+    <p>«Хабарлама» жолағында баланың денсаулығы мен құжаттары туралы мәліметті көрсетпеуіңізді өтінеміз. Жасы мен дайындық деңгейі сынақ сабағына жазылу кезінде нақтыланады.</p>
+  </section>
+
+  <section>
+    <div class="h2"><span class="num">09</span><h2>Деректеріңіз немен қорғалған</h2></div>
+    <ul class="list">
+      <li>сайтпен байланыс шифрланады — HTTPS хаттамасы жұмыс істейді;</li>
+      <li>форма жолақтарының мазмұны екі рет тексеріледі: алдымен браузерде, сосын серверде;</li>
+      <li>өтінімдер қоймасына тек Академия қызметкерлері жіберіледі, кіру құпиясөзбен қорғалған;</li>
+      <li>IP-мекенжайдан тек дербестендірілмеген таңба ғана қалады;</li>
+      <li>қолжетімділік кілттері сайт кодынан тыс сақталады;</li>
+      <li>жіберу жиілігі шектелген, сондықтан форма арқылы спам тарату пайдасыз.</li>
+    </ul>
+    <p>Жүз пайыздық кепілдікті ешкім бере алмайды. Мүддеңізге нұқсан келтіретін дерек ағып кетсе, біз бұл туралы сізге де, уәкілетті органға да заң талап еткен тәртіппен хабарлаймыз.</p>
+  </section>
+
+  <section>
+    <div class="h2"><span class="num">10</span><h2>Нені талап ете аласыз</h2></div>
+    <p>Кез келген күні сіз бізде өзіңіз туралы қандай мәлімет бар екенін сұрауға, оны нақтылауды не толық өшіруді талап етуге, сондай-ақ бұрын берген келісіміңізді кері қайтаруға құқылысыз. Кері қайтару болашаққа әрекет етеді: оған дейін жүргізілген өңдеу заңды болып қала береді.</p>
+    <p>Ол үшін жазу немесе қоңырау шалу жеткілікті — байланыс бет соңында.</p>
+  </section>
+
+  <section>
+    <div class="h2"><span class="num">11</span><h2>Құжаттың жаңаруы</h2></div>
+    <p>Уақыт өте мәтін өзгеруі мүмкін. Соңғы редакция әрқашан осы мекенжайда тұрады, ал оның күні ең жоғарыда көрсетілген.</p>
+  </section>
+
+  <section>
+    <div class="h2"><span class="num">12</span><h2>Байланыс</h2></div>
+    <div class="panel">
+      <p class="who">SmartHub робототехника және дрон академиясы</p>
+      <p>Электрондық пошта: <a href="mailto:info@smarthub.kz">info@smarthub.kz</a></p>
+      <p>Телефон: <a href="tel:+77003575949">+7 700 357 59 49</a></p>
+      <p>Астана, Қазақстан</p>
+    </div>
+  </section>
+
+</div>
+
+</div>
+
+<footer>
+  <div class="container">
+    <div class="foot-in">
+      <img src="/assets/logo-light.png?v=2" alt="SmartHub">
+      <span data-t="copy">© 2026 SmartHub — Академия робототехники и дронов</span>
+      <span class="right"><a href="/" data-t="back">На главную</a></span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function () {
+  // Шапка, заголовок и подвал переводятся построчно, а сам юридический
+  // текст переключается целыми блоками — по фразам его резать нельзя.
+  var CHROME = {
+    ru: { back: 'На главную', tag: 'Правовая информация',
+          title: 'Политика конфиденциальности',
+          lead: 'Коротко и по существу: какие данные мы получаем через формы на сайте, зачем они нужны, кому передаются и как их удалить.',
+          updated: 'Редакция от 8 августа 2026 года',
+          copy: '© 2026 SmartHub — Академия робототехники и дронов',
+          doc: 'Политика конфиденциальности — SmartHub' },
+    en: { back: 'Back to site', tag: 'Legal',
+          title: 'Privacy Policy',
+          lead: 'Short and to the point: what we receive through the forms on this site, why we need it, who else sees it and how to have it deleted.',
+          updated: 'Version of 8 August 2026',
+          copy: '© 2026 SmartHub — Robotics & Drone Academy',
+          doc: 'Privacy Policy — SmartHub' },
+    kz: { back: 'Басты бетке', tag: 'Құқықтық ақпарат',
+          title: 'Құпиялылық саясаты',
+          lead: 'Қысқа әрі нақты: сайттағы формалар арқылы қандай деректерді аламыз, олар не үшін керек, кімге беріледі және оларды қалай өшіруге болады.',
+          updated: '2026 жылғы 8 тамыздағы редакция',
+          copy: '© 2026 SmartHub — Робототехника және дрон академиясы',
+          doc: 'Құпиялылық саясаты — SmartHub' }
+  };
+
+  function apply(lang) {
+    if (!CHROME[lang]) lang = 'ru';
+    var t = CHROME[lang];
+
+    document.querySelectorAll('[data-t]').forEach(function (el) {
+      var v = t[el.getAttribute('data-t')];
+      if (v != null) el.textContent = v;
+    });
+    document.querySelectorAll('.doc').forEach(function (d) {
+      d.hidden = d.getAttribute('data-doc') !== lang;
+    });
+    document.querySelectorAll('.lang button').forEach(function (b) {
+      b.classList.toggle('on', b.getAttribute('data-set') === lang);
+    });
+
+    document.documentElement.lang = lang === 'kz' ? 'kk' : lang;
+    document.title = t.doc;
+    try { localStorage.setItem('smarthub_lang', lang); } catch (e) {}
+  }
+
+  document.querySelectorAll('.lang button').forEach(function (b) {
+    b.addEventListener('click', function () { apply(b.getAttribute('data-set')); });
+  });
+
+  // подхватываем язык, выбранный на главной странице
+  var saved = 'ru';
+  try { saved = localStorage.getItem('smarthub_lang') || 'ru'; } catch (e) {}
+  apply(saved);
+})();
+</script>
+
+</body>
+</html>

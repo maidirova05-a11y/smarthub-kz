@@ -1,0 +1,17 @@
+# зависимости
+node_modules/
+
+# привязка к Vercel и локальные переменные окружения
+.vercel/
+.env
+.env.local
+.env.*.local
+
+# локальные настройки Claude Code: в них попадают строки запущенных
+# команд, включая вебхуки и пароли — в репозиторий им нельзя
+.claude/settings.local.json
+
+# служебное
+*.log
+.DS_Store
+Thumbs.db

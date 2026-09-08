@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /api/
+
+# Языковые версии — отдельные страницы, индексируются
+Allow: /en/
+Allow: /kz/
+
+Sitemap: https://smarthub-kz.com/sitemap.xml
