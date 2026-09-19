@@ -13,17 +13,18 @@
   <meta name="theme-color" content="#0C0035">
   <meta name="author" content="SmartHub Robotics Academy">
   <meta name="geo.region" content="KZ-AST">
-  <meta name="geo.placename" content="Астана">
+  <meta name="geo.placename" content="Astana">
 
   <link rel="icon" href="/assets/favicon.ico?v=3" sizes="any">
   <link rel="icon" href="/assets/favicon.png?v=3" type="image/png" sizes="512x512">
   <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png?v=3">
+  <link rel="manifest" href="/site.webmanifest">
 
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="SmartHub Robotics Academy">
   <meta property="og:locale" content="en_US">
+  <meta property="og:locale:alternate" content="ru_KZ">
   <meta property="og:locale:alternate" content="kk_KZ">
-  <meta property="og:locale:alternate" content="en_US">
   <meta property="og:url" content="https://smarthub-kz.com/en">
   <meta property="og:title" content="SmartHub — Robotics & Drone Academy in Astana">
   <meta property="og:description" content="SmartHub Robotics & Drone Academy in Astana. Robotics, drone piloting and preparation for international tournaments. 6 branches, 300+ students. Trial lesson 5,000 ₸.">
@@ -669,6 +670,53 @@
       .price-card.feat:hover .pf-check { background: #fff; }
       .price-card.feat:hover::after { background: #fff; color: var(--purple); }
     }
+    /* ── FAQ ──────────────────────────────────────────────────────────
+       Native <details>, not a JS accordion. The answers are in the HTML
+       whether or not the script runs, which is the whole point: a crawler
+       that does not execute JavaScript still reads them, and the FAQPage
+       markup emitted alongside is only safe while the text is visible. */
+    .faq-wrap { max-width: 860px; margin: 0 auto; }
+    .faq-item {
+      border: 1px solid var(--line);
+      border-radius: var(--r-md);
+      background: var(--white);
+      margin-bottom: var(--gutter);
+      overflow: hidden;
+    }
+    .faq-item[open] { border-color: var(--purple); }
+    .faq-item > summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 22px 56px 22px 24px;
+      position: relative;
+      font-size: 17px;
+      font-weight: 600;
+      line-height: 1.45;
+      color: var(--text);
+    }
+    .faq-item > summary::-webkit-details-marker { display: none; }
+    .faq-item > summary::after {
+      content: "";
+      position: absolute;
+      right: 24px;
+      top: 50%;
+      width: 10px;
+      height: 10px;
+      margin-top: -7px;
+      border-right: 2px solid var(--purple);
+      border-bottom: 2px solid var(--purple);
+      transform: rotate(45deg);
+      transition: transform .2s ease;
+    }
+    .faq-item[open] > summary::after { transform: rotate(-135deg); margin-top: -3px; }
+    .faq-item > summary:focus-visible { outline: 2px solid var(--purple); outline-offset: -2px; }
+    .faq-a { padding: 0 24px 22px; color: var(--text-2); font-size: 16px; line-height: 1.68; }
+    @media (max-width: 680px) {
+      .faq-item > summary { padding: 18px 46px 18px 18px; font-size: 16px; }
+      .faq-item > summary::after { right: 18px; }
+      .faq-a { padding: 0 18px 18px; font-size: 15px; }
+    }
+
     .price-note { margin-top: var(--gutter); padding: 22px 26px; background: var(--surface); border-radius: var(--r-md); font-size: 14px; font-weight: 300; line-height: 1.55; color: var(--text-2); }
     .price-note strong { font-weight: 500; color: var(--ink); }
 
@@ -1088,6 +1136,7 @@
         <li><a href="#branches" data-i18n="nav.branches">Branches</a></li>
         <li><a href="#reviews" data-i18n="nav.reviews">Reviews</a></li>
         <li><a href="#pricing" data-i18n="nav.pricing">Pricing</a></li>
+        <li><a href="#faq" data-i18n="nav.faq">FAQ</a></li>
         <li><a href="#contact" data-i18n="nav.contact">Contact</a></li>
       </ul>
       <div class="nav-right">
@@ -1113,6 +1162,7 @@
     <li><a href="#branches" onclick="closeMobile()" data-i18n="nav.branches">Branches</a></li>
     <li><a href="#reviews" onclick="closeMobile()" data-i18n="nav.reviews">Reviews</a></li>
     <li><a href="#pricing" onclick="closeMobile()" data-i18n="nav.pricing">Pricing</a></li>
+    <li><a href="#faq" onclick="closeMobile()" data-i18n="nav.faq">FAQ</a></li>
     <li><a href="#contact" onclick="closeMobile()" data-i18n="nav.contact">Contact</a></li>
     <li><a href="#register" class="mm-cta" onclick="closeMobile()" data-i18n="nav.trial">Book Trial →</a></li>
   </ul>
@@ -1608,6 +1658,62 @@
   </div>
 </section>
 
+<!-- ══════════ FAQ ══════════
+     Answers the objections that come up on the phone, and feeds the FAQPage
+     JSON-LD that tools/build-langs.py emits per language. Two rules:
+       · every answer restates a fact already on this page (prices from the
+         pricing cards, levels from the programmes, addresses from branches);
+       · the markup and the visible text must stay identical — the build
+         reads BOTH from the same data-i18n dictionary, so keep it that way.
+     -->
+<section id="faq" class="sec">
+  <div class="container">
+    <div class="sec-head reveal">
+      <div class="label" data-i18n="faq.label">FAQ</div>
+      <div class="orn-row">
+        <div class="orn left"><span class="orn-line"></span><span class="orn-dot"></span></div>
+        <h2 class="sec-title d2" data-i18n="faq.title">Questions parents <span class='hl'>ask most</span></h2>
+        <div class="orn right"><span class="orn-line"></span><span class="orn-dot"></span></div>
+      </div>
+      <p class="sec-desc" data-i18n="faq.desc">Short answers to what comes up most often before a first class.</p>
+    </div>
+    <div class="faq-wrap reveal">
+      <details class="faq-item" open>
+        <summary data-i18n="faq.q1">How much does SmartHub cost?</summary>
+        <div class="faq-a" data-i18n="faq.a1">A trial lesson is a one-time 5,000 ₸: a full 60-minute class with hands-on work on real equipment and a level assessment included. After that, robotics is 45,000 ₸ per month and drone piloting is 36,000 ₸ per month. Current rates are fixed for existing students.</div>
+      </details>
+      <details class="faq-item">
+        <summary data-i18n="faq.q2">What grades do you accept?</summary>
+        <div class="faq-a" data-i18n="faq.a2">The robotics programme covers Grades 1 to 11 across four levels: Junior (Grades 1–4), Middle (5–7), Master (8–9) and Expert (10–11). The right level is chosen during the trial lesson, which includes the assessment.</div>
+      </details>
+      <details class="faq-item">
+        <summary data-i18n="faq.q3">Does my child need prior robotics or programming experience?</summary>
+        <div class="faq-a" data-i18n="faq.a3">No. The Junior level starts from the basics — sensors, motors and first programs on LEGO Education WeDo 2.0. Each level builds on the one before it, so a child can start from zero in any grade.</div>
+      </details>
+      <details class="faq-item">
+        <summary data-i18n="faq.q4">Where are the SmartHub branches?</summary>
+        <div class="faq-a" data-i18n="faq.a4">Six branches in Astana. The headquarters is Skillset School at 2/3 Bauyrzhan Momyshuly Avenue; the other sites are hosted at Schools № 84, № 17, № 97, № 66 and № 101. One more branch operates in Baku — Innovation Hub Technopark, 55 Nizami Street.</div>
+      </details>
+      <details class="faq-item">
+        <summary data-i18n="faq.q5">What equipment do students work with?</summary>
+        <div class="faq-a" data-i18n="faq.a5">LEGO Education WeDo 2.0 and SPIKE Prime, Arduino, IoT sensors and racing drones — the same equipment students take to real competitions.</div>
+      </details>
+      <details class="faq-item">
+        <summary data-i18n="faq.q6">What does the drone programme include?</summary>
+        <div class="faq-a" data-i18n="faq.a6">Two tracks. "Drone management" covers safety, fundamentals and piloting over 3 months. "Drone football" is a team game with strategy and tournament preparation, running year-round.</div>
+      </details>
+      <details class="faq-item">
+        <summary data-i18n="faq.q7">Do you prepare students for competitions?</summary>
+        <div class="faq-a" data-i18n="faq.a7">Yes — competitive robotics is a track of its own, preparing students for city, national and international tournaments. SmartHub students hold more than 50 international medals across 6 countries, including a world championship in Turkey and the First LEGO League world festival in Houston.</div>
+      </details>
+      <details class="faq-item">
+        <summary data-i18n="faq.q8">How do I book a trial lesson?</summary>
+        <div class="faq-a" data-i18n="faq.a8">Fill in the form on this page or call us. We reply within 2 hours, match the level and agree a convenient time. The trial lesson commits you to nothing.</div>
+      </details>
+    </div>
+  </div>
+</section>
+
 <!-- ══════════ REGISTER (ref: dark block + white 380px form card) ══════════ -->
 <section id="register">
   <div class="container">
@@ -1616,7 +1722,7 @@
         <div>
           <div class="label" data-i18n="reg.label">Register Now</div>
           <h2 class="reg-title d2" data-i18n="reg.title">Start Your Child's <span class='hl'>Engineering Journey</span></h2>
-          <p class="reg-desc" data-i18n="reg.desc">Book a free trial lesson. We'll assess the right level, introduce the program, and answer all your questions.</p>
+          <p class="reg-desc" data-i18n="reg.desc">Book a trial lesson. We'll assess the right level, introduce the program, and answer all your questions.</p>
         </div>
         <div class="panel-white">
           <form class="reg-form" onsubmit="handleReg(event)">
@@ -1755,6 +1861,8 @@
   /* ══ TRANSLATIONS ══ */
   const I18N = {
     ru: {
+      "nav.faq":"Вопросы",
+      "faq.label":"Вопросы","faq.title":"Частые вопросы <span class='hl'>родителей</span>","faq.desc":"Коротко отвечаем на то, что чаще всего спрашивают перед первым занятием.","faq.q1":"Сколько стоит обучение в SmartHub?","faq.a1":"Пробный урок — 5 000 ₸ разово: полное занятие 60 минут с практикой на настоящем оборудовании и оценкой уровня. Дальше робототехника стоит 45 000 ₸ в месяц, пилотирование дронами — 36 000 ₸ в месяц. Текущие цены зафиксированы для действующих учеников.","faq.q2":"С какого класса можно записать ребёнка?","faq.a2":"Программа по робототехнике охватывает 1–11 классы и разбита на четыре уровня: Junior (1–4 классы), Middle (5–7), Master (8–9) и Expert (10–11). Подходящий уровень подбирается на пробном уроке — оценка входит в него.","faq.q3":"Нужен ли ребёнку опыт в робототехнике или программировании?","faq.a3":"Нет. Уровень Junior начинается с основ — датчики, моторы и первые программы на LEGO Education WeDo 2.0. Каждый следующий уровень опирается на предыдущий, поэтому начать с нуля можно в любом классе.","faq.q4":"Где находятся филиалы SmartHub?","faq.a4":"В Астане работают шесть филиалов. Головной офис — Skillset School на проспекте Бауыржана Момышулы, 2/3; остальные площадки расположены в школах № 84, № 17, № 97, № 66 и № 101. Ещё один филиал работает в Баку — Innovation Hub Technopark, улица Низами 55.","faq.q5":"На каком оборудовании занимаются дети?","faq.a5":"LEGO Education WeDo 2.0 и SPIKE Prime, Arduino, IoT-датчики и гоночные дроны — то же оборудование, с которым ученики выходят на реальные соревнования.","faq.q6":"Что входит в программу по дронам?","faq.a6":"Два направления. «Управление дроном» — безопасность, основы и пилотирование, рассчитано на 3 месяца. «Дрон-футбол» — командная игра со стратегией и подготовкой к турнирам, идёт постоянно.","faq.q7":"Готовите ли вы к соревнованиям?","faq.a7":"Да, это отдельное направление — соревновательная робототехника: подготовка к городским, республиканским и международным турнирам. У учеников SmartHub более 50 международных медалей в 6 странах, включая чемпионат мира в Турции и международный финал First LEGO League в Хьюстоне.","faq.q8":"Как записаться на пробный урок?","faq.a8":"Заполните форму на этой странице или позвоните нам. Мы отвечаем в течение 2 часов, подберём уровень и удобное время. Пробный урок ни к чему не обязывает.",
       "nav.programs":"Программы","nav.achievements":"Достижения","nav.branches":"Филиалы","nav.reviews":"Отзывы","nav.pricing":"Цены","nav.contact":"Контакты","nav.trial":"Пробный урок →",
       "hero.badge":"Первая академия робототехники и дронов в Казахстане","hero.title":"Здесь рождаются <span class='hl'>будущие инженеры</span>","hero.desc":"От новичка до чемпиона мира — SmartHub превращает детей в технических создателей завтрашнего дня через практическую робототехнику, пилотирование дронов и победы на международных соревнованиях.","hero.cta1":"Записаться на пробный урок →","hero.cta2":"Смотреть программы","hero.stat1":"Активных учеников","hero.stat2":"Филиалов","hero.stat3":"Медалей","hero.stat4":"Стран",
       "float.champ":"Чемпионы мира","float.champs":"Турция · автономные роботы","float.drone":"Дрон-футбол","float.drones":"Уникальный спорт","float.ai":"Arduino & IoT","float.ais":"Реальная электроника",
@@ -1772,7 +1880,7 @@
       "feat.title":"SmartHub открывает <span class='hl'>новые возможности</span> для ребёнка:","feat.1":"Инженерное мышление","feat.2":"Реальные проекты и электроника","feat.3":"Международные соревнования","feat.4":"Гранты и старт карьеры",
       "rev.label":"Отзывы родителей","rev.title":"Что говорят семьи <span class='hl'>о SmartHub</span>","rev.desc":"Услышьте напрямую от родителей, которые видят прогресс своих детей.","rev.1":"«Мой сын начал 3 года назад с нуля. Путь от первых сборок LEGO до уверенного участия в соревнованиях оказался быстрее, чем я могла представить.»","rev.1n":"Айзат К.","rev.1r":"Родитель ученика уровня Master","rev.2":"«Преподаватели искренне переживают за прогресс каждого ребёнка. Малые группы — и моя дочь получает реальную обратную связь на каждом занятии.»","rev.2n":"Мадина С.","rev.2r":"Родитель двух учеников SmartHub","rev.3":"«Ребёнок собрал в SmartHub портфолио проектов и соревнований. Практический опыт и работа в команде заметно повлияли на его уверенность в технических предметах.»","rev.3n":"Ерлан Б.","rev.3r":"Родитель выпускника уровня Expert",
       "price.label":"Цены","price.title":"Простые и <span class='hl'>прозрачные цены</span>","price.desc":"Начните с пробного урока без риска. Зафиксируйте сегодняшние цены — скоро стоимость для новых записей вырастет.","price.t.name":"Пробный урок","price.t.per":"Разово · Полное занятие 60 минут","price.t.f1":"Обзор всей программы","price.t.f2":"Практика на настоящем оборудовании","price.t.f3":"Оценка уровня включена","price.t.f4":"Знакомство с преподавателем","price.t.btn":"Записаться на пробный","price.m.name":"Робототехника","price.m.per":"В месяц","price.m.f1":"Все программы доступны","price.m.f2":"Обучение под ваш уровень","price.m.f3":"Подготовка к соревнованиям","price.m.f4":"Доступ к международным турнирам","price.m.f5":"Отслеживание прогресса","price.m.f6":"Доступ в портал для родителей","price.m.btn":"Записаться →","price.m.badge":"Популярный","price.note.s":"⚡ Уведомление о ценах:","price.note":"Текущие цены зафиксированы для действующих учеников. Новые записи в следующем цикле — по более высоким ценам. Запишитесь сейчас, чтобы зафиксировать стоимость.",
-      "reg.label":"Записаться","reg.title":"Начните <span class='hl'>инженерный путь</span> вашего ребёнка","reg.desc":"Запишитесь на бесплатный пробный урок. Мы подберём уровень, познакомим с программой и ответим на все вопросы.","reg.name":"Имя родителя","reg.phone":"Номер телефона","reg.select":"Выберите программу","reg.o1":"Робототехника — Junior (1–4 кл.)","reg.o2":"Робототехника — Middle (5–7 кл.)","reg.o3":"Робототехника — Master (8–9 кл.)","reg.o4":"Робототехника — Expert (10–11 кл.)","reg.o5":"Дроны — Управление","reg.o6":"Дроны — Дрон-футбол","reg.o7":"Соревновательная робототехника","reg.o8":"Летний лагерь","reg.btn":"Записаться →","reg.btn.sent":"✓ Заявка отправлена!","reg.t1":"✓ Без обязательств","reg.t2":"✓ Пробный урок 5 000 ₸","reg.t3":"✓ Ответим в течение 2 часов",
+      "reg.label":"Записаться","reg.title":"Начните <span class='hl'>инженерный путь</span> вашего ребёнка","reg.desc":"Запишитесь на пробный урок. Мы подберём уровень, познакомим с программой и ответим на все вопросы.","reg.name":"Имя родителя","reg.phone":"Номер телефона","reg.select":"Выберите программу","reg.o1":"Робототехника — Junior (1–4 кл.)","reg.o2":"Робототехника — Middle (5–7 кл.)","reg.o3":"Робототехника — Master (8–9 кл.)","reg.o4":"Робототехника — Expert (10–11 кл.)","reg.o5":"Дроны — Управление","reg.o6":"Дроны — Дрон-футбол","reg.o7":"Соревновательная робототехника","reg.o8":"Летний лагерь","reg.btn":"Записаться →","reg.btn.sent":"✓ Заявка отправлена!","reg.t1":"✓ Без обязательств","reg.t2":"✓ Пробный урок 5 000 ₸","reg.t3":"✓ Ответим в течение 2 часов",
       "con.label":"Связаться","con.title":"Готовы сделать <span class='hl'>первый шаг?</span>","con.desc":"Наша команда готова ответить на вопросы о программах, расписании и записи. Свяжитесь с нами по телефону, почте или зайдите в любой филиал.","con.p1":"Астана — Skillset","con.p2":"Баку, Азербайджан","con.email":"Эл. почта","con.hq":"Головной офис","con.hqv":"Skillset School, Астана, Казахстан","con.form.title":"Напишите нам","con.form.name":"Ваше имя","con.form.phone":"Телефон","con.form.email":"Эл. почта","con.form.interest":"Интересующая программа","con.form.i1":"Робототехника","con.form.i2":"Дроны","con.form.i3":"Соревновательная робототехника","con.form.i4":"Общий вопрос","con.form.msg":"Ваше сообщение или вопрос...","con.form.btn":"Отправить сообщение →","con.form.sent":"✓ Сообщение отправлено!",
       "foot.desc":"Первая академия робототехники и дронов в Казахстане. Растим инженеров завтрашнего дня через практику и международные соревнования с 2017 года.","foot.astana":"Астана","foot.baku":"Баку","foot.programs":"Программы","foot.company":"Компания","foot.branches":"Филиалы","foot.p1":"Robotics Junior","foot.p2":"Robotics Middle","foot.p3":"Robotics Master","foot.p4":"Robotics Expert","foot.p5":"Управление дроном","foot.p6":"Дрон-футбол","foot.sch":"Школа № 84","foot.sch17":"Школа № 17","foot.sch97":"Школа № 97","foot.sch66":"Школа № 66","foot.baku2":"Баку, Азербайджан","foot.copy":"© 2025 SmartHub — Академия робототехники и дронов. Все права защищены.","foot.astana2":"Астана, Казахстан","foot.baku3":"Баку, Азербайджан",
       "price.d.name":"Пилотирование дронами","price.d.per":"В месяц","yr.label":"Итоги года","yr.title":"Наши достижения <span class='hl'>за год</span>","yr.desc":"Призовые места наших учеников на турнирах этого года.","yr.p1":"I место","yr.p2":"II место","yr.p3":"III место","yr.award":"Награда","yr.top5":"Топ-5","yr.multi":"4 призовых места","yr.e1":"Международный этап · категория «Доставщик»","yr.e2":"Autonomous Car Racing · средняя школа","yr.e3":"Autonomous Car Racing · младшая школа","yr.e4":"Lego Line Following · младшая школа","yr.e5":"Региональный этап · Robomission Elementary","yr.e6":"Autonomous Car Racing · младшая школа","yr.e7":"Autonomous Car Racing · средняя школа","yr.e8":"Республиканский этап · категория «Доставщик»","yr.e9":"Младшая школа","yr.e10":"Дрон-футбол","yr.e11":"Республиканский этап",
@@ -1785,6 +1893,8 @@
       "seo.desc":"Академия робототехники и дронов SmartHub в Астане. Робототехника, пилотирование дронов, подготовка к международным турнирам. 6 филиалов, 300+ учеников. Пробный урок 5 000 ₸.","seo.ogtitle":"SmartHub — академия робототехники и дронов в Астане"
     },
     en: {
+      "nav.faq":"FAQ",
+      "faq.label":"FAQ","faq.title":"Questions parents <span class='hl'>ask most</span>","faq.desc":"Short answers to what comes up most often before a first class.","faq.q1":"How much does SmartHub cost?","faq.a1":"A trial lesson is a one-time 5,000 ₸: a full 60-minute class with hands-on work on real equipment and a level assessment included. After that, robotics is 45,000 ₸ per month and drone piloting is 36,000 ₸ per month. Current rates are fixed for existing students.","faq.q2":"What grades do you accept?","faq.a2":"The robotics programme covers Grades 1 to 11 across four levels: Junior (Grades 1–4), Middle (5–7), Master (8–9) and Expert (10–11). The right level is chosen during the trial lesson, which includes the assessment.","faq.q3":"Does my child need prior robotics or programming experience?","faq.a3":"No. The Junior level starts from the basics — sensors, motors and first programs on LEGO Education WeDo 2.0. Each level builds on the one before it, so a child can start from zero in any grade.","faq.q4":"Where are the SmartHub branches?","faq.a4":"Six branches in Astana. The headquarters is Skillset School at 2/3 Bauyrzhan Momyshuly Avenue; the other sites are hosted at Schools № 84, № 17, № 97, № 66 and № 101. One more branch operates in Baku — Innovation Hub Technopark, 55 Nizami Street.","faq.q5":"What equipment do students work with?","faq.a5":"LEGO Education WeDo 2.0 and SPIKE Prime, Arduino, IoT sensors and racing drones — the same equipment students take to real competitions.","faq.q6":"What does the drone programme include?","faq.a6":"Two tracks. \"Drone management\" covers safety, fundamentals and piloting over 3 months. \"Drone football\" is a team game with strategy and tournament preparation, running year-round.","faq.q7":"Do you prepare students for competitions?","faq.a7":"Yes — competitive robotics is a track of its own, preparing students for city, national and international tournaments. SmartHub students hold more than 50 international medals across 6 countries, including a world championship in Turkey and the First LEGO League world festival in Houston.","faq.q8":"How do I book a trial lesson?","faq.a8":"Fill in the form on this page or call us. We reply within 2 hours, match the level and agree a convenient time. The trial lesson commits you to nothing.",
       "nav.programs":"Programs","nav.achievements":"Achievements","nav.branches":"Branches","nav.reviews":"Reviews","nav.pricing":"Pricing","nav.contact":"Contact","nav.trial":"Book Trial →",
       "hero.badge":"Kazakhstan's First Robotics & Drone Academy","hero.title":"Where Future <span class='hl'>Engineers Are Born</span>","hero.desc":"From beginner to world champion — SmartHub transforms children into tomorrow's tech creators through hands-on robotics, drone piloting, and international competition excellence.","hero.cta1":"Book Free Trial Lesson →","hero.cta2":"Explore Programs","hero.stat1":"Active Students","hero.stat2":"Branches","hero.stat3":"Int'l Medals","hero.stat4":"Countries",
       "float.champ":"World Champions","float.champs":"Turkey · autonomous robots","float.drone":"Drone Football","float.drones":"A unique sport","float.ai":"Arduino & IoT","float.ais":"Real electronics",
@@ -1802,7 +1912,7 @@
       "feat.title":"SmartHub unlocks <span class='hl'>new opportunities</span> for your child:","feat.1":"Engineering mindset","feat.2":"Real projects and electronics","feat.3":"International competitions","feat.4":"Grants and a career start",
       "rev.label":"Parent Reviews","rev.title":"What Families Say <span class='hl'>About SmartHub</span>","rev.desc":"Hear directly from parents who watch their children progress.","rev.1":"\"My son started 3 years ago with zero experience. The path from his first LEGO builds to competing with confidence was faster than I imagined.\"","rev.1n":"Aizat K.","rev.1r":"Parent of a Robotics Master student","rev.2":"\"The instructors genuinely care about each child's progress. Small groups mean my daughter gets real feedback every class.\"","rev.2n":"Madina S.","rev.2r":"Parent of two SmartHub students","rev.3":"\"My child built a portfolio of projects and competitions at SmartHub. The hands-on experience and teamwork noticeably boosted his confidence in technical subjects.\"","rev.3n":"Erlan B.","rev.3r":"Parent of an Expert-level graduate",
       "price.label":"Pricing","price.title":"Simple, <span class='hl'>Transparent Pricing</span>","price.desc":"Start with a risk-free trial lesson. Lock in today's rates — prices are increasing for new registrations soon.","price.t.name":"Trial Lesson","price.t.per":"One-time · Full 60-minute class","price.t.f1":"Full curriculum preview","price.t.f2":"Hands-on with real equipment","price.t.f3":"Level assessment included","price.t.f4":"Meet your future instructor","price.t.btn":"Book Trial Lesson","price.m.name":"Robotics","price.m.per":"Per month","price.m.f1":"All programs available","price.m.f2":"Level-matched instruction","price.m.f3":"Competition preparation","price.m.f4":"International tournament access","price.m.f5":"Progress tracking","price.m.f6":"Parent portal access","price.m.btn":"Enroll Now →","price.m.badge":"Most Popular","price.note.s":"⚡ Pricing Notice:","price.note":"Current rates are fixed for existing students. New enrollments in the next cycle will be at higher rates. Register now to lock in today's pricing.",
-      "reg.label":"Register Now","reg.title":"Start Your Child's <span class='hl'>Engineering Journey</span>","reg.desc":"Book a free trial lesson. We'll assess the right level, introduce the program, and answer all your questions.","reg.name":"Parent's Name","reg.phone":"Phone Number","reg.select":"Select Program","reg.o1":"Robotics — Junior (Grades 1–4)","reg.o2":"Robotics — Middle (Grades 5–7)","reg.o3":"Robotics — Master (Grades 8–9)","reg.o4":"Robotics — Expert (Grades 10–11)","reg.o5":"Drones — Management","reg.o6":"Drones — Drone Football","reg.o7":"Competitive Robotics","reg.o8":"Summer Camp","reg.btn":"Book Trial →","reg.btn.sent":"✓ Request Sent!","reg.t1":"✓ No commitment required","reg.t2":"✓ 5,000 ₸ trial lesson","reg.t3":"✓ Response within 2 hours",
+      "reg.label":"Register Now","reg.title":"Start Your Child's <span class='hl'>Engineering Journey</span>","reg.desc":"Book a trial lesson. We'll assess the right level, introduce the program, and answer all your questions.","reg.name":"Parent's Name","reg.phone":"Phone Number","reg.select":"Select Program","reg.o1":"Robotics — Junior (Grades 1–4)","reg.o2":"Robotics — Middle (Grades 5–7)","reg.o3":"Robotics — Master (Grades 8–9)","reg.o4":"Robotics — Expert (Grades 10–11)","reg.o5":"Drones — Management","reg.o6":"Drones — Drone Football","reg.o7":"Competitive Robotics","reg.o8":"Summer Camp","reg.btn":"Book Trial →","reg.btn.sent":"✓ Request Sent!","reg.t1":"✓ No commitment required","reg.t2":"✓ 5,000 ₸ trial lesson","reg.t3":"✓ Response within 2 hours",
       "con.label":"Get in Touch","con.title":"Ready to Take the <span class='hl'>First Step?</span>","con.desc":"Our team is ready to answer your questions about programs, scheduling and enrollment. Contact us by phone, email, or visit any branch.","con.p1":"Astana — Skillset","con.p2":"Baku, Azerbaijan","con.email":"Email","con.hq":"Headquarters","con.hqv":"Skillset School, Astana, Kazakhstan","con.form.title":"Send Us a Message","con.form.name":"Your Name","con.form.phone":"Phone Number","con.form.email":"Email Address","con.form.interest":"Program of Interest","con.form.i1":"Robotics","con.form.i2":"Drones","con.form.i3":"Competitive Robotics","con.form.i4":"General Inquiry","con.form.msg":"Your message or question...","con.form.btn":"Send Message →","con.form.sent":"✓ Message Sent!",
       "foot.desc":"Kazakhstan's first robotics and drone academy. Developing tomorrow's engineers through hands-on learning and international competition since 2017.","foot.astana":"Astana","foot.baku":"Baku","foot.programs":"Programs","foot.company":"Company","foot.branches":"Branches","foot.p1":"Robotics Junior","foot.p2":"Robotics Middle","foot.p3":"Robotics Master","foot.p4":"Robotics Expert","foot.p5":"Drone Management","foot.p6":"Drone Football","foot.sch":"School № 84","foot.sch17":"School № 17","foot.sch97":"School № 97","foot.sch66":"School № 66","foot.baku2":"Baku, Azerbaijan","foot.copy":"© 2025 SmartHub — Robotics & Drone Academy. All rights reserved.","foot.astana2":"Astana, Kazakhstan","foot.baku3":"Baku, Azerbaijan",
       "price.d.name":"Drone Piloting","price.d.per":"Per month","yr.label":"Year in review","yr.title":"Our achievements <span class='hl'>this year</span>","yr.desc":"Prize places won by our students at this year's tournaments.","yr.p1":"1st place","yr.p2":"2nd place","yr.p3":"3rd place","yr.award":"Award","yr.top5":"Top 5","yr.multi":"4 prize places","yr.e1":"International stage · «Доставщик» category","yr.e2":"Autonomous Car Racing · middle school","yr.e3":"Autonomous Car Racing · elementary school","yr.e4":"Lego Line Following · elementary school","yr.e5":"Regional stage · Robomission Elementary","yr.e6":"Autonomous Car Racing · elementary school","yr.e7":"Autonomous Car Racing · middle school","yr.e8":"National stage · «Доставщик» category","yr.e9":"Elementary school","yr.e10":"Drone soccer","yr.e11":"National stage",
@@ -1815,6 +1925,8 @@
       "seo.desc":"SmartHub Robotics & Drone Academy in Astana. Robotics, drone piloting and preparation for international tournaments. 6 branches, 300+ students. Trial lesson 5,000 ₸.","seo.ogtitle":"SmartHub — Robotics & Drone Academy in Astana"
     },
     kz: {
+      "nav.faq":"Сұрақтар",
+      "faq.label":"Сұрақтар","faq.title":"Ата-аналар <span class='hl'>жиі қоятын сұрақтар</span>","faq.desc":"Алғашқы сабақ алдында жиі қойылатын сұрақтарға қысқаша жауап береміз.","faq.q1":"SmartHub-та оқу қанша тұрады?","faq.a1":"Сынақ сабағы — бір реттік 5 000 ₸: нақты жабдықпен тәжірибе және деңгейді бағалау кіретін толық 60 минуттық сабақ. Одан әрі робототехника айына 45 000 ₸, дрон ұшыру айына 36 000 ₸ тұрады. Ағымдағы бағалар қолданыстағы оқушылар үшін бекітілген.","faq.q2":"Баланы қай сыныптан бастап жазуға болады?","faq.a2":"Робототехника бағдарламасы 1–11 сыныптарды қамтиды және төрт деңгейге бөлінген: Junior (1–4 сынып), Middle (5–7), Master (8–9) және Expert (10–11). Қажетті деңгей сынақ сабағында таңдалады — бағалау соның ішінде.","faq.q3":"Балаға робототехника немесе бағдарламалау тәжірибесі керек пе?","faq.a3":"Жоқ. Junior деңгейі негізден басталады — сенсорлар, моторлар және LEGO Education WeDo 2.0-дегі алғашқы бағдарламалар. Әр келесі деңгей алдыңғысына сүйенеді, сондықтан кез келген сыныпта нөлден бастауға болады.","faq.q4":"SmartHub филиалдары қай жерде орналасқан?","faq.a4":"Астанада алты филиал жұмыс істейді. Бас кеңсе — Бауыржан Момышұлы даңғылы, 2/3 мекенжайындағы Skillset School; қалған алаңдар № 84, № 17, № 97, № 66 және № 101 мектептерде орналасқан. Тағы бір филиал Бакуде жұмыс істейді — Innovation Hub Technopark, Низами көшесі 55.","faq.q5":"Балалар қандай жабдықпен айналысады?","faq.a5":"LEGO Education WeDo 2.0 және SPIKE Prime, Arduino, IoT сенсорлар мен жарыстық дрондар — оқушылар нақты жарыстарға шығатын дәл сол жабдық.","faq.q6":"Дрон бағдарламасына не кіреді?","faq.a6":"Екі бағыт. «Дронды басқару» — қауіпсіздік, негіздер және ұшыру, 3 айға есептелген. «Дрон-футбол» — стратегиясы мен турнирлерге дайындығы бар командалық ойын, үнемі жүреді.","faq.q7":"Жарыстарға дайындайсыздар ма?","faq.a7":"Иә, бұл бөлек бағыт — жарыстық робототехника: қалалық, республикалық және халықаралық турнирлерге дайындық. SmartHub оқушыларында 6 елде 50-ден астам халықаралық медаль бар, оның ішінде Түркиядағы әлем чемпионаты және Хьюстондағы First LEGO League халықаралық финалы.","faq.q8":"Сынақ сабағына қалай жазылуға болады?","faq.a8":"Осы беттегі форманы толтырыңыз немесе бізге қоңырау шалыңыз. Біз 2 сағат ішінде жауап беріп, деңгейді таңдап, ыңғайлы уақытты келісеміз. Сынақ сабағы ешқандай міндеттеме жүктемейді.",
       "nav.programs":"Бағдарламалар","nav.achievements":"Жетістіктер","nav.branches":"Филиалдар","nav.reviews":"Пікірлер","nav.pricing":"Бағалар","nav.contact":"Байланыс","nav.trial":"Сынақ сабағы →",
       "hero.badge":"Қазақстандағы алғашқы робототехника және дрон академиясы","hero.title":"Осында <span class='hl'>болашақ инженерлер</span> дүниеге келеді","hero.desc":"Бастаушыдан әлем чемпионына дейін — SmartHub балаларды практикалық робототехника, дрон ұшыру және халықаралық жарыстардағы жеңістер арқылы ертеңгі технологиялық жасаушыларға айналдырады.","hero.cta1":"Сынақ сабағына жазылу →","hero.cta2":"Бағдарламаларды көру","hero.stat1":"Белсенді оқушы","hero.stat2":"Филиал","hero.stat3":"Медаль","hero.stat4":"Ел",
       "float.champ":"Әлем чемпиондары","float.champs":"Түркия · автономды роботтар","float.drone":"Дрон-футбол","float.drones":"Бірегей спорт","float.ai":"Arduino & IoT","float.ais":"Нақты электроника",
@@ -1832,7 +1944,7 @@
       "feat.title":"SmartHub балаңызға <span class='hl'>жаңа мүмкіндіктер</span> ашады:","feat.1":"Инженерлік ойлау","feat.2":"Нақты жобалар мен электроника","feat.3":"Халықаралық жарыстар","feat.4":"Гранттар мен мансап бастамасы",
       "rev.label":"Ата-ана пікірлері","rev.title":"Отбасылар <span class='hl'>SmartHub туралы</span> не дейді","rev.desc":"Балаларының дамуын көріп отырған ата-аналардан тікелей естіңіз.","rev.1":"«Ұлым 3 жыл бұрын нөлден бастады. Алғашқы LEGO құрастырудан жарысқа сеніммен қатысуға дейінгі жол ойлағанымнан тез болды.»","rev.1n":"Айзат К.","rev.1r":"Master деңгейіндегі оқушының ата-анасы","rev.2":"«Оқытушылар әр баланың дамуына шын жүректен алаңдайды. Шағын топтар — қызым әр сабақта нақты кері байланыс алады.»","rev.2n":"Мадина С.","rev.2r":"SmartHub-тың екі оқушысының ата-анасы","rev.3":"«Балам SmartHub-та жобалар мен жарыстар портфолиосын жинады. Тәжірибелік жұмыс пен командада істеу оның техникалық пәндерге сенімін нығайтты.»","rev.3n":"Ерлан Б.","rev.3r":"Expert деңгейіндегі түлектің ата-анасы",
       "price.label":"Бағалар","price.title":"Қарапайым және <span class='hl'>ашық бағалар</span>","price.desc":"Тәуекелсіз сынақ сабағынан бастаңыз. Бүгінгі бағаны бекітіңіз — жаңа жазылу үшін баға жуырда өседі.","price.t.name":"Сынақ сабағы","price.t.per":"Бір рет · Толық 60 минуттық сабақ","price.t.f1":"Бүкіл бағдарламаға шолу","price.t.f2":"Нақты жабдықпен практика","price.t.f3":"Деңгейді бағалау кіреді","price.t.f4":"Оқытушымен танысу","price.t.btn":"Сынақ сабағына жазылу","price.m.name":"Робототехника","price.m.per":"Айына","price.m.f1":"Барлық бағдарлама қолжетімді","price.m.f2":"Деңгейге сай оқыту","price.m.f3":"Жарысқа дайындық","price.m.f4":"Халықаралық турнирге қолжетімділік","price.m.f5":"Прогресті бақылау","price.m.f6":"Ата-ана порталына кіру","price.m.btn":"Жазылу →","price.m.badge":"Танымал","price.note.s":"⚡ Баға туралы хабарлама:","price.note":"Ағымдағы бағалар қолданыстағы оқушылар үшін бекітілген. Келесі циклдегі жаңа жазылулар жоғары бағамен. Бағаны бекіту үшін қазір жазылыңыз.",
-      "reg.label":"Жазылу","reg.title":"Балаңыздың <span class='hl'>инженерлік жолын</span> бастаңыз","reg.desc":"Тегін сынақ сабағына жазылыңыз. Деңгейді таңдап, бағдарламамен таныстырып, барлық сұраққа жауап береміз.","reg.name":"Ата-ана аты","reg.phone":"Телефон нөмірі","reg.select":"Бағдарламаны таңдаңыз","reg.o1":"Робототехника — Junior (1–4 сын.)","reg.o2":"Робототехника — Middle (5–7 сын.)","reg.o3":"Робототехника — Master (8–9 сын.)","reg.o4":"Робототехника — Expert (10–11 сын.)","reg.o5":"Дрондар — Басқару","reg.o6":"Дрондар — Дрон-футбол","reg.o7":"Жарыстық робототехника","reg.o8":"Жазғы лагерь","reg.btn":"Жазылу →","reg.btn.sent":"✓ Өтінім жіберілді!","reg.t1":"✓ Міндеттемесіз","reg.t2":"✓ Сынақ сабағы 5 000 ₸","reg.t3":"✓ 2 сағат ішінде жауап береміз",
+      "reg.label":"Жазылу","reg.title":"Балаңыздың <span class='hl'>инженерлік жолын</span> бастаңыз","reg.desc":"Сынақ сабағына жазылыңыз. Деңгейді таңдап, бағдарламамен таныстырып, барлық сұраққа жауап береміз.","reg.name":"Ата-ана аты","reg.phone":"Телефон нөмірі","reg.select":"Бағдарламаны таңдаңыз","reg.o1":"Робототехника — Junior (1–4 сын.)","reg.o2":"Робототехника — Middle (5–7 сын.)","reg.o3":"Робототехника — Master (8–9 сын.)","reg.o4":"Робототехника — Expert (10–11 сын.)","reg.o5":"Дрондар — Басқару","reg.o6":"Дрондар — Дрон-футбол","reg.o7":"Жарыстық робототехника","reg.o8":"Жазғы лагерь","reg.btn":"Жазылу →","reg.btn.sent":"✓ Өтінім жіберілді!","reg.t1":"✓ Міндеттемесіз","reg.t2":"✓ Сынақ сабағы 5 000 ₸","reg.t3":"✓ 2 сағат ішінде жауап береміз",
       "con.label":"Байланыс","con.title":"<span class='hl'>Алғашқы қадам</span> жасауға дайынсыз ба?","con.desc":"Командамыз бағдарлама, кесте және жазылу туралы сұрақтарыңызға жауап беруге дайын. Телефон, пошта арқылы хабарласыңыз немесе кез келген филиалға келіңіз.","con.p1":"Астана — Skillset","con.p2":"Баку, Әзербайжан","con.email":"Эл. пошта","con.hq":"Бас кеңсе","con.hqv":"Skillset School, Астана, Қазақстан","con.form.title":"Бізге жазыңыз","con.form.name":"Атыңыз","con.form.phone":"Телефон","con.form.email":"Эл. пошта","con.form.interest":"Қызықтыратын бағдарлама","con.form.i1":"Робототехника","con.form.i2":"Дрондар","con.form.i3":"Жарыстық робототехника","con.form.i4":"Жалпы сұрақ","con.form.msg":"Хабарламаңыз немесе сұрағыңыз...","con.form.btn":"Хабарлама жіберу →","con.form.sent":"✓ Хабарлама жіберілді!",
       "foot.desc":"Қазақстандағы алғашқы робототехника және дрон академиясы. 2017 жылдан бері практика мен халықаралық жарыстар арқылы ертеңгі инженерлерді өсіреміз.","foot.astana":"Астана","foot.baku":"Баку","foot.programs":"Бағдарламалар","foot.company":"Компания","foot.branches":"Филиалдар","foot.p1":"Robotics Junior","foot.p2":"Robotics Middle","foot.p3":"Robotics Master","foot.p4":"Robotics Expert","foot.p5":"Дрон басқару","foot.p6":"Дрон-футбол","foot.sch":"№ 84 мектеп","foot.sch17":"№ 17 мектеп","foot.sch97":"№ 97 мектеп","foot.sch66":"№ 66 мектеп","foot.baku2":"Баку, Әзербайжан","foot.copy":"© 2025 SmartHub — Робототехника және дрон академиясы. Барлық құқық қорғалған.","foot.astana2":"Астана, Қазақстан","foot.baku3":"Баку, Әзербайжан",
       "price.d.name":"Дрон ұшыру","price.d.per":"Айына","yr.label":"Жыл қорытындысы","yr.title":"<span class='hl'>Жыл ішіндегі</span> жетістіктеріміз","yr.desc":"Оқушыларымыздың осы жылғы турнирлердегі жүлделі орындары.","yr.p1":"I орын","yr.p2":"II орын","yr.p3":"III орын","yr.award":"Марапат","yr.top5":"Топ-5","yr.multi":"4 жүлделі орын","yr.e1":"Халықаралық кезең · «Доставщик» санаты","yr.e2":"Autonomous Car Racing · орта мектеп","yr.e3":"Autonomous Car Racing · бастауыш мектеп","yr.e4":"Lego Line Following · бастауыш мектеп","yr.e5":"Аймақтық кезең · Robomission Elementary","yr.e6":"Autonomous Car Racing · бастауыш мектеп","yr.e7":"Autonomous Car Racing · орта мектеп","yr.e8":"Республикалық кезең · «Доставщик» санаты","yr.e9":"Бастауыш мектеп","yr.e10":"Дрон-футбол","yr.e11":"Республикалық кезең",
@@ -1844,6 +1956,21 @@
       "form.consent":"Дербес деректерімді өңдеуге келісемін және <a href=\"/privacy\" target=\"_blank\" rel=\"noopener\">құпиялылық саясатын</a> қабылдаймын","foot.privacy":"Құпиялылық саясаты",
       "seo.desc":"Астанадағы SmartHub робототехника және дрон академиясы. Робототехника, дрон ұшыру, халықаралық турнирлерге дайындық. 6 филиал, 300+ оқушы. Сынақ сабағы 5 000 ₸.","seo.ogtitle":"SmartHub — Астанадағы робототехника және дрон академиясы"
     }
+  };
+
+  /*
+   * Ключ словаря ("kz") и код языка для <html lang> ("kk") — разные вещи.
+   * Папка /kz, кнопка переключателя и I18N названы "kz"; BCP-47 такого кода
+   * для казахского не знает, а applyLang проставлял его в <html lang>, стирая
+   * правильный "kk", с которым страницу отдал сервер. Невалидный lang сбивает
+   * и определение языка поисковиком, и выбор голоса экранным диктором.
+   *
+   * Объявлено глобально: тем же переводом пользуются обработчики форм ниже,
+   * лежащие в собственных IIFE.
+   */
+  window.SH_HTML_LANG = { ru: 'ru', en: 'en', kz: 'kk' };
+  window.SH_DICT_KEY = function () {
+    return ({ ru: 'ru', en: 'en', kk: 'kz' })[document.documentElement.lang] || 'ru';
   };
 
   const titles = {
@@ -1864,7 +1991,7 @@
     });
     const badge = document.querySelector('.price-card.feat');
     if (badge && dict['price.m.badge']) badge.setAttribute('data-badge', dict['price.m.badge']);
-    document.documentElement.lang = lang;
+    document.documentElement.lang = window.SH_HTML_LANG[lang] || lang;
     if (titles[lang]) document.title = titles[lang];
     document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('on', b.dataset.lang === lang));
     try { localStorage.setItem('smarthub_lang', lang); } catch(e) {}
@@ -1883,7 +2010,7 @@
   // Init language (default RU)
   // Страница уже отдана на нужном языке — берём его из <html lang>,
   // иначе сохранённый выбор перетёр бы статический перевод.
-  const PAGE_LANG = { ru: 'ru', en: 'en', kk: 'kz' }[document.documentElement.lang] || 'ru';
+  const PAGE_LANG = window.SH_DICT_KEY();
   applyLang(PAGE_LANG);
 
   /* ══ SCROLL: progress + back-to-top ══ */
@@ -1953,7 +2080,7 @@
   /* ══ FORMS ══ */
   function handleReg(e) {
     e.preventDefault();
-    const lang = document.documentElement.lang || 'ru';
+    const lang = window.SH_DICT_KEY();
     const btn = e.target.querySelector('button');
     btn.textContent = (I18N[lang] && I18N[lang]['reg.btn.sent']) || '✓';
     btn.style.background = 'linear-gradient(135deg,#10B981,#059669)';
@@ -1962,7 +2089,7 @@
   }
   function handleContact(e) {
     e.preventDefault();
-    const lang = document.documentElement.lang || 'ru';
+    const lang = window.SH_DICT_KEY();
     const btn = e.target.querySelector('.cf-submit');
     btn.textContent = (I18N[lang] && I18N[lang]['con.form.sent']) || '✓';
     btn.style.background = 'linear-gradient(135deg,#10B981,#059669)';
@@ -2668,7 +2795,16 @@
 <script>
 (function () {
   function t(key, fallback) {
-    var d = window.I18N && I18N[document.documentElement.lang || 'ru'];
+    /*
+     * `typeof I18N`, а не `window.I18N`: словарь объявлен как `const` на
+     * верхнем уровне скрипта, а такие объявления живут в глобальной лексической
+     * области и НЕ становятся свойствами window. Прежняя проверка
+     * `window.I18N && ...` поэтому всегда давала undefined, и надписи на кнопке
+     * отправки у англоязычных и казахоязычных посетителей молча падали на
+     * русский запасной вариант. Ключи form.sending / form.sent / form.error
+     * есть во всех трёх словарях.
+     */
+    var d = (typeof I18N === 'undefined') ? null : I18N[window.SH_DICT_KEY()];
     return (d && d[key]) || fallback;
   }
   function val(form, sel) {
@@ -2991,6 +3127,117 @@
   "publisher": {
     "@id": "https://smarthub-kz.com/#organization"
   }
+}
+</script>
+<script type="application/ld+json" id="ld-page">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebPage",
+      "@id": "https://smarthub-kz.com/en#webpage",
+      "url": "https://smarthub-kz.com/en",
+      "name": "SmartHub — Robotics & Drone Academy | Kazakhstan",
+      "description": "SmartHub Robotics & Drone Academy in Astana. Robotics, drone piloting and preparation for international tournaments. 6 branches, 300+ students. Trial lesson 5,000 ₸.",
+      "inLanguage": "en",
+      "isPartOf": {
+        "@id": "https://smarthub-kz.com/#website"
+      },
+      "about": {
+        "@id": "https://smarthub-kz.com/#organization"
+      },
+      "primaryImageOfPage": "https://smarthub-kz.com/assets/og-image.jpg?v=2",
+      "breadcrumb": {
+        "@id": "https://smarthub-kz.com/en#breadcrumb"
+      }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "@id": "https://smarthub-kz.com/en#breadcrumb",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "SmartHub",
+          "item": "https://smarthub-kz.com/en"
+        }
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://smarthub-kz.com/en#faq",
+      "inLanguage": "en",
+      "isPartOf": {
+        "@id": "https://smarthub-kz.com/en#webpage"
+      },
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "How much does SmartHub cost?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "A trial lesson is a one-time 5,000 ₸: a full 60-minute class with hands-on work on real equipment and a level assessment included. After that, robotics is 45,000 ₸ per month and drone piloting is 36,000 ₸ per month. Current rates are fixed for existing students."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What grades do you accept?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The robotics programme covers Grades 1 to 11 across four levels: Junior (Grades 1–4), Middle (5–7), Master (8–9) and Expert (10–11). The right level is chosen during the trial lesson, which includes the assessment."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Does my child need prior robotics or programming experience?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. The Junior level starts from the basics — sensors, motors and first programs on LEGO Education WeDo 2.0. Each level builds on the one before it, so a child can start from zero in any grade."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Where are the SmartHub branches?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Six branches in Astana. The headquarters is Skillset School at 2/3 Bauyrzhan Momyshuly Avenue; the other sites are hosted at Schools № 84, № 17, № 97, № 66 and № 101. One more branch operates in Baku — Innovation Hub Technopark, 55 Nizami Street."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What equipment do students work with?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "LEGO Education WeDo 2.0 and SPIKE Prime, Arduino, IoT sensors and racing drones — the same equipment students take to real competitions."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What does the drone programme include?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Two tracks. \"Drone management\" covers safety, fundamentals and piloting over 3 months. \"Drone football\" is a team game with strategy and tournament preparation, running year-round."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Do you prepare students for competitions?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes — competitive robotics is a track of its own, preparing students for city, national and international tournaments. SmartHub students hold more than 50 international medals across 6 countries, including a world championship in Turkey and the First LEGO League world festival in Houston."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How do I book a trial lesson?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Fill in the form on this page or call us. We reply within 2 hours, match the level and agree a convenient time. The trial lesson commits you to nothing."
+          }
+        }
+      ]
+    }
+  ]
 }
 </script>
 </body>
