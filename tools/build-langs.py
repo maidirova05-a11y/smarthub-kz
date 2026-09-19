@@ -21,6 +21,24 @@ SITE = 'https://smarthub-kz.com'
 # Правьте вручную вместе с содержимым.
 LASTMOD = '2026-09-19'
 
+# Подтверждение прав на сайт в Google Search Console и Яндекс.Вебмастере.
+#
+# Пока сайт не подтверждён, консоль вообще не даёт им управлять: ни отправить
+# sitemap, ни посмотреть, почему страница не в индексе, ни запросить переобход.
+#
+# Вставьте СЮДА только значение content, без самого тега <meta>, и запустите
+# скрипт — теги попадут во все три языковые версии сразу:
+#   Google -> search.google.com/search-console  (способ «HTML-тег»)
+#   Яндекс -> webmaster.yandex.ru               (способ «Мета-тег»)
+#
+# Пустая строка = тег не выводится вовсе. Это не то же самое, что пустой
+# content="": обе панели периодически перепроверяют тег и СНИМАЮТ
+# подтверждение, если он исчез или пуст, — то есть пустой тег хуже, чем никакого.
+VERIFICATION = {
+    'google-site-verification': '',
+    'yandex-verification': '',
+}
+
 # lang -> (папка, значение атрибута lang, og:locale)
 # путь в URL (без завершающего слэша — в vercel.json trailingSlash:false),
 # папка для файла, значение <html lang>, og:locale
@@ -227,6 +245,24 @@ def retarget_head(html, lang):
         for prop in ('og:title', 'twitter:title'):
             html = re.sub(r'((?:property|name)="%s" content=")[^"]*(")' % prop,
                           lambda m: m.group(1) + dic['seo.ogtitle'] + m.group(2), html, count=1)
+
+    # Теги подтверждения прав. Как и с hreflang, сначала сносим прошлые:
+    # скрипт читает index.html, который сам же перезаписывает, иначе при смене
+    # токена рядом остался бы старый — а лишний тег подтверждения ломает
+    # проверку так же надёжно, как его отсутствие.
+    html = re.sub(
+        r'[ \t]*<meta name="(?:google-site-verification|yandex-verification)" content="[^"]*">\r?\n',
+        '', html)
+    if any(VERIFICATION.values()):
+        # Переводы строк в файле смешанные (часть головы — CRLF, часть — LF),
+        # поэтому якорь ищем регулярным выражением и повторяем ТОТ перевод
+        # строки, который стоял после него, а не навязываем свой.
+        m = re.search(r'(<meta name="author" content="[^"]*">)(\r?\n)', html)
+        assert m, 'нет якоря для тегов подтверждения у %s' % lang
+        eol = m.group(2)
+        tags = ''.join('  <meta name="%s" content="%s">%s' % (name, token, eol)
+                       for name, token in VERIFICATION.items() if token)
+        html = html[:m.end()] + tags + html[m.end():]
 
     # hreflang: сначала сносим прошлый блок, потом ставим свежий.
     # Скрипт читает index.html, который сам же и перезаписывает, — без этой
