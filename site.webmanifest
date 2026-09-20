@@ -1,0 +1,17 @@
+{
+  "name": "SmartHub — академия робототехники и дронов",
+  "short_name": "SmartHub",
+  "description": "Академия робототехники и дронов SmartHub в Астане. Робототехника, пилотирование дронов, подготовка к международным турнирам.",
+  "lang": "ru",
+  "dir": "ltr",
+  "start_url": "/",
+  "scope": "/",
+  "display": "browser",
+  "background_color": "#ffffff",
+  "theme_color": "#0C0035",
+  "categories": ["education", "kids"],
+  "icons": [
+    { "src": "/assets/favicon.png?v=3", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/assets/apple-touch-icon.png?v=3", "sizes": "180x180", "type": "image/png", "purpose": "any" }
+  ]
+}

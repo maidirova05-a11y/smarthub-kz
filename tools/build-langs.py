@@ -15,6 +15,30 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SRC = os.path.join(ROOT, 'index.html')
 SITE = 'https://smarthub-kz.com'
 
+# Дата последнего содержательного изменения страниц, для <lastmod> в sitemap.
+# НЕ дата сборки: lastmod, который меняется на каждый деплой, поисковик
+# перестаёт учитывать — он видит «изменение» без единой правки текста.
+# Правьте вручную вместе с содержимым.
+LASTMOD = '2026-09-19'
+
+# Подтверждение прав на сайт в Google Search Console и Яндекс.Вебмастере.
+#
+# Пока сайт не подтверждён, консоль вообще не даёт им управлять: ни отправить
+# sitemap, ни посмотреть, почему страница не в индексе, ни запросить переобход.
+#
+# Вставьте СЮДА только значение content, без самого тега <meta>, и запустите
+# скрипт — теги попадут во все три языковые версии сразу:
+#   Google -> search.google.com/search-console  (способ «HTML-тег»)
+#   Яндекс -> webmaster.yandex.ru               (способ «Мета-тег»)
+#
+# Пустая строка = тег не выводится вовсе. Это не то же самое, что пустой
+# content="": обе панели периодически перепроверяют тег и СНИМАЮТ
+# подтверждение, если он исчез или пуст, — то есть пустой тег хуже, чем никакого.
+VERIFICATION = {
+    'google-site-verification': '',
+    'yandex-verification': '',
+}
+
 # lang -> (папка, значение атрибута lang, og:locale)
 # путь в URL (без завершающего слэша — в vercel.json trailingSlash:false),
 # папка для файла, значение <html lang>, og:locale
@@ -115,6 +139,70 @@ def alternates():
     return '\r\n'.join(rows)
 
 
+# ── микроразметка вопросов ────────────────────────────────────────────
+# FAQPage строится из того же словаря, что подставляется в видимую секцию
+# #faq, — значит вопросы и ответы в разметке дословно совпадают с тем, что
+# читает посетитель. Это единственное условие, при котором FAQ-разметку
+# вообще можно отдавать: ответы, которых нет на странице, Google в лучшем
+# случае игнорирует, в худшем — снимает расширенные сниппеты со всего сайта.
+def faq_graph(lang):
+    dic = DICTS[lang]
+    items = []
+    i = 1
+    while ('faq.q%d' % i) in dic and ('faq.a%d' % i) in dic:
+        items.append({
+            '@type': 'Question',
+            'name': dic['faq.q%d' % i],
+            'acceptedAnswer': {'@type': 'Answer', 'text': dic['faq.a%d' % i]},
+        })
+        i += 1
+    if not items:
+        return []
+
+    path = TARGETS[lang][0]
+    url = '%s/%s' % (SITE, path)
+    code = {'ru': 'ru', 'en': 'en', 'kz': 'kk'}[lang]
+    # <h2> секции содержит <span class='hl'>, в имя крошки разметка не идёт.
+    return [
+        {
+            '@type': 'WebPage',
+            '@id': url + '#webpage',
+            'url': url,
+            'name': TITLES.get(lang, ''),
+            'description': dic.get('seo.desc', ''),
+            'inLanguage': code,
+            'isPartOf': {'@id': SITE + '/#website'},
+            'about': {'@id': SITE + '/#organization'},
+            'primaryImageOfPage': SITE + '/assets/og-image.jpg?v=2',
+            'breadcrumb': {'@id': url + '#breadcrumb'},
+        },
+        {
+            '@type': 'BreadcrumbList',
+            '@id': url + '#breadcrumb',
+            'itemListElement': [
+                {'@type': 'ListItem', 'position': 1, 'name': 'SmartHub', 'item': url},
+            ],
+        },
+        {
+            '@type': 'FAQPage',
+            '@id': url + '#faq',
+            'inLanguage': code,
+            'isPartOf': {'@id': url + '#webpage'},
+            'mainEntity': items,
+        },
+    ]
+
+
+def faq_block(lang):
+    nodes = faq_graph(lang)
+    if not nodes:
+        return ''
+    doc = {'@context': 'https://schema.org', '@graph': nodes}
+    body = json.dumps(doc, ensure_ascii=False, indent=2)
+    return ('<script type="application/ld+json" id="ld-page">\r\n'
+            + body.replace('\n', '\r\n') + '\r\n</script>\r\n')
+
+
 def retarget_head(html, lang):
     path, folder, lang_attr, locale = TARGETS[lang]
     url = '%s/%s' % (SITE, path)
@@ -130,6 +218,22 @@ def retarget_head(html, lang):
     html = html.replace('<meta property="og:locale" content="ru_KZ">',
                         '<meta property="og:locale" content="%s">' % locale, 1)
 
+    # og:locale:alternate — ОСТАЛЬНЫЕ языки, а не скопированный из русской
+    # версии список. Раньше он переносился дословно, поэтому /en объявлял
+    # своей альтернативой en_US (сам себя) и вовсе не упоминал ru_KZ.
+    others = [TARGETS[l][3] for l in TARGETS if l != lang]
+    html = re.sub(
+        r'(?:[ \t]*<meta property="og:locale:alternate" content="[^"]*">\r?\n)+',
+        lambda m: ''.join('  <meta property="og:locale:alternate" content="%s">\r\n' % o
+                          for o in others),
+        html, count=1)
+
+    # geo.placename в латинице для английской версии: в остальных двух город
+    # называется кириллицей, и подставлять её в англоязычную страницу незачем.
+    if lang == 'en':
+        html = html.replace('<meta name="geo.placename" content="Астана">',
+                            '<meta name="geo.placename" content="Astana">', 1)
+
     # описание и og:title берём из словаря, если ключи заданы
     if 'seo.desc' in dic:
         html = re.sub(r'(<meta name="description" content=")[^"]*(")',
@@ -142,6 +246,24 @@ def retarget_head(html, lang):
             html = re.sub(r'((?:property|name)="%s" content=")[^"]*(")' % prop,
                           lambda m: m.group(1) + dic['seo.ogtitle'] + m.group(2), html, count=1)
 
+    # Теги подтверждения прав. Как и с hreflang, сначала сносим прошлые:
+    # скрипт читает index.html, который сам же перезаписывает, иначе при смене
+    # токена рядом остался бы старый — а лишний тег подтверждения ломает
+    # проверку так же надёжно, как его отсутствие.
+    html = re.sub(
+        r'[ \t]*<meta name="(?:google-site-verification|yandex-verification)" content="[^"]*">\r?\n',
+        '', html)
+    if any(VERIFICATION.values()):
+        # Переводы строк в файле смешанные (часть головы — CRLF, часть — LF),
+        # поэтому якорь ищем регулярным выражением и повторяем ТОТ перевод
+        # строки, который стоял после него, а не навязываем свой.
+        m = re.search(r'(<meta name="author" content="[^"]*">)(\r?\n)', html)
+        assert m, 'нет якоря для тегов подтверждения у %s' % lang
+        eol = m.group(2)
+        tags = ''.join('  <meta name="%s" content="%s">%s' % (name, token, eol)
+                       for name, token in VERIFICATION.items() if token)
+        html = html[:m.end()] + tags + html[m.end():]
+
     # hreflang: сначала сносим прошлый блок, потом ставим свежий.
     # Скрипт читает index.html, который сам же и перезаписывает, — без этой
     # чистки старые адреса накапливались бы от запуска к запуску.
@@ -149,6 +271,16 @@ def retarget_head(html, lang):
     marker = '<link rel="canonical" href="%s">' % url
     assert marker in html, 'canonical для %s не найден' % lang
     html = html.replace(marker, marker + '\r\n' + alternates(), 1)
+
+    # Разметка страницы (WebPage + BreadcrumbList + FAQPage) на нужном языке.
+    # Сначала сносим блок прошлой сборки: скрипт читает index.html, который сам
+    # же перезаписывает, иначе блоки копились бы от запуска к запуску.
+    html = re.sub(r'[ \t]*<script type="application/ld\+json" id="ld-page">[\s\S]*?</script>\r?\n',
+                  '', html)
+    block = faq_block(lang)
+    if block:
+        assert '</body>' in html, 'нет </body> у %s' % lang
+        html = html.replace('</body>', block + '</body>', 1)
     return html
 
 
@@ -189,16 +321,18 @@ for lang, (path, _, _, _) in TARGETS.items():
         '    <loc>%s/%s</loc>\n'
         '%s\n'
         '      <xhtml:link rel="alternate" hreflang="x-default" href="%s/"/>\n'
+        '    <lastmod>%s</lastmod>\n'
         '    <changefreq>weekly</changefreq>\n'
         '    <priority>%s</priority>\n'
-        '  </url>' % (SITE, path, alts, SITE, '1.0' if lang == 'ru' else '0.9'))
+        '  </url>' % (SITE, path, alts, SITE, LASTMOD, '1.0' if lang == 'ru' else '0.9'))
 
 pages.append(
     '  <url>\n'
     '    <loc>%s/privacy</loc>\n'
+    '    <lastmod>%s</lastmod>\n'
     '    <changefreq>yearly</changefreq>\n'
     '    <priority>0.3</priority>\n'
-    '  </url>' % SITE)
+    '  </url>' % (SITE, LASTMOD))
 
 sitemap = ('<?xml version="1.0" encoding="UTF-8"?>\n'
            '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"\n'
