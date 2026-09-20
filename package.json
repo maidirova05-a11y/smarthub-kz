@@ -6,7 +6,8 @@
   "description": "SmartHub Robotics Academy — landing page, lead API and admin panel",
   "scripts": {
     "dev": "vercel dev",
-    "deploy": "vercel --prod"
+    "deploy": "vercel --prod",
+    "check:seo": "node tools/check-seo.mjs"
   },
   "engines": {
     "node": ">=18"
