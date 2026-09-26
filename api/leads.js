@@ -1,10 +1,12 @@
 // Admin-only feed of submissions. The panel polls GET; DELETE removes rows.
-import { listLeads, deleteLeads, isAuthed, dbConfigured } from '../lib/store.js';
+import { listLeads, deleteLeads, isAuthed, dbConfigured, sameOrigin } from '../lib/store.js';
 
 export default async function handler(req, res) {
   if (!isAuthed(req)) return res.status(401).json({ ok: false, error: 'unauthorised' });
 
   if (req.method === 'DELETE') {
+    // SameSite=Strict already stops cross-site cookies; this is the second lock.
+    if (!sameOrigin(req)) return res.status(403).json({ ok: false, error: 'bad_origin' });
     let ids = [];
     const q = req.query.id;
     if (q) ids = String(q).split(',');
