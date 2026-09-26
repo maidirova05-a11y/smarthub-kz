@@ -1,0 +1,77 @@
+name: Резервная копия базы
+
+# Каждую ночь снимает копию боевой базы, шифрует её и кладёт в облачное
+# хранилище (S3-совместимое). Настройка и восстановление — BACKUP.md.
+on:
+  schedule:
+    - cron: '17 21 * * *' # 02:17 по Астане (UTC+5)
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: db-backup
+  cancel-in-progress: false
+
+jobs:
+  backup:
+    name: Backup
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      DATABASE_URL: ${{ secrets.PROD_DATABASE_URL }}
+      BACKUP_PASSPHRASE: ${{ secrets.BACKUP_PASSPHRASE }}
+      S3_BUCKET: ${{ secrets.BACKUP_S3_BUCKET }}
+      S3_ENDPOINT: ${{ secrets.BACKUP_S3_ENDPOINT }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.BACKUP_S3_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.BACKUP_S3_SECRET_ACCESS_KEY }}
+      AWS_DEFAULT_REGION: ${{ secrets.BACKUP_S3_REGION || 'auto' }}
+      GH_TOKEN: ${{ github.token }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Проверить настройки
+        id: cfg
+        run: |
+          # Событие schedule не несёт сведений о репозитории — спрашиваем API.
+          PRIVATE_REPO=$(curl -fsS -H "Authorization: Bearer $GH_TOKEN" \
+            "$GITHUB_API_URL/repos/$GITHUB_REPOSITORY" | jq -r .private)
+          echo "private=$PRIVATE_REPO" >> "$GITHUB_OUTPUT"
+          if [ -z "$DATABASE_URL" ] && [ -z "$BACKUP_PASSPHRASE" ] && [ -z "$S3_BUCKET" ]; then
+            echo "::warning title=Резервное копирование не настроено::Добавьте секреты по инструкции в BACKUP.md — пока копии не снимаются."
+            echo "run=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          missing=()
+          [ -n "$DATABASE_URL" ] || missing+=(PROD_DATABASE_URL)
+          [ -n "$BACKUP_PASSPHRASE" ] || missing+=(BACKUP_PASSPHRASE)
+          if [ -n "$S3_BUCKET" ]; then
+            [ -n "$AWS_ACCESS_KEY_ID" ] || missing+=(BACKUP_S3_ACCESS_KEY_ID)
+            [ -n "$AWS_SECRET_ACCESS_KEY" ] || missing+=(BACKUP_S3_SECRET_ACCESS_KEY)
+          elif [ "$PRIVATE_REPO" != true ]; then
+            # Публичный репозиторий: файлы запусков видны всем, так что без
+            # облака хранить копию негде.
+            missing+=(BACKUP_S3_BUCKET)
+          fi
+          if [ "${#missing[@]}" -gt 0 ]; then
+            echo "::error title=Не хватает секретов::${missing[*]} — см. BACKUP.md"
+            exit 1
+          fi
+          echo "run=true" >> "$GITHUB_OUTPUT"
+
+      - name: Снять копию и отправить в облако
+        if: steps.cfg.outputs.run == 'true'
+        run: BACKUP_NAME="${GITHUB_REPOSITORY#*/}" backup/backup.sh
+
+      # Только в приватном репозитории и как запасной вариант: копия также
+      # лежит 30 дней среди файлов запуска (Actions → запуск → Artifacts).
+      - name: Сохранить копию в GitHub
+        if: steps.cfg.outputs.run == 'true' && steps.cfg.outputs.private == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: db-backup-${{ github.run_id }}
+          path: backups/*.dump.gpg
+          retention-days: 30
+          if-no-files-found: error
