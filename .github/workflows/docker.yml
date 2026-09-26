@@ -1,0 +1,99 @@
+name: Docker и восстановление
+
+# Проверяет запасной вариант целиком: образ собирается, сайт с базой
+# поднимается и работает, копия базы снимается, шифруется, уходит в облако
+# (здесь — его эмулятор) и восстанавливается обратно. См. BACKUP.md.
+on:
+  # Любая ветка: результат виден и в PR (он привязан к коммиту), и при
+  # прямых пушах в main.
+  push:
+  # Раз в неделю — учебное восстановление: базовые образы обновляются, и
+  # запасной вариант должен оставаться рабочим, даже если код не менялся.
+  schedule:
+    - cron: '0 22 * * 6' # воскресенье, 03:00 по Астане
+  workflow_dispatch:
+    inputs:
+      postgres_major:
+        description: Версия Postgres в compose (как у боевой базы)
+        default: '17'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: docker-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  docker:
+    name: Docker round trip
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    env:
+      POSTGRES_MAJOR: ${{ inputs.postgres_major || '17' }}
+      BACKUP_PASSPHRASE: ci-backup-passphrase-0123456789
+      BACKUP_NAME: ci
+      AWS_ACCESS_KEY_ID: ci
+      AWS_SECRET_ACCESS_KEY: ci-secret
+      AWS_DEFAULT_REGION: us-east-1
+      S3_ENDPOINT: http://127.0.0.1:5055
+      S3_BUCKET: ci-backups
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # Порт базы открывается только здесь, в CI, чтобы снять копию снаружи
+      # так же, как с боевой базы.
+      - name: Открыть порт базы для проверки
+        run: |
+          printf 'services:\n  db:\n    ports:\n      - "127.0.0.1:55432:5432"\n' > "$RUNNER_TEMP/db-port.yaml"
+          echo "COMPOSE_FILE=compose.yaml:$RUNNER_TEMP/db-port.yaml" >> "$GITHUB_ENV"
+
+      - name: Собрать, поднять, проверить
+        run: docker/smoke.sh
+
+      - name: Эмулятор облачного хранилища
+        run: |
+          python3 -m venv "$RUNNER_TEMP/moto"
+          "$RUNNER_TEMP/moto/bin/pip" install --quiet 'moto[server]'
+          "$RUNNER_TEMP/moto/bin/moto_server" -p 5055 > "$RUNNER_TEMP/moto.log" 2>&1 &
+          for _ in $(seq 1 30); do curl -s -o /dev/null "$S3_ENDPOINT" && break; sleep 1; done
+          aws --endpoint-url "$S3_ENDPOINT" s3 mb "s3://$S3_BUCKET"
+
+      - name: Копия → облако → восстановление
+        run: |
+          set -euo pipefail
+          DB_USER=$(docker compose exec -T db printenv POSTGRES_USER)
+          DB_NAME=$(docker compose exec -T db printenv POSTGRES_DB)
+          sql() { docker compose exec -T db psql -U "$DB_USER" -d "${2:-$DB_NAME}" -v ON_ERROR_STOP=1 -XAtqc "$1"; }
+
+          sql "CREATE TABLE ci_marker (v text); INSERT INTO ci_marker VALUES ('до копии')"
+          # sslmode=require: заодно проверяем, что TLS в базе compose включён.
+          DATABASE_URL="postgresql://$DB_USER:app@127.0.0.1:55432/$DB_NAME?sslmode=require" backup/backup.sh
+
+          echo "::group::Восстановление в базу compose"
+          sql "DROP TABLE ci_marker"
+          backup/restore.sh latest
+          [ "$(sql 'SELECT v FROM ci_marker')" = "до копии" ] || { echo "::error::данные не восстановились"; exit 1; }
+          echo "::endgroup::"
+
+          echo "::group::Восстановление по адресу (как в новую Neon)"
+          sql "CREATE DATABASE restore_check" postgres
+          backup/restore.sh latest "postgresql://$DB_USER:app@127.0.0.1:55432/restore_check?sslmode=require"
+          [ "$(sql 'SELECT v FROM ci_marker' restore_check)" = "до копии" ] || { echo "::error::данные не восстановились"; exit 1; }
+          echo "::endgroup::"
+
+          echo "::group::Неверный пароль отклоняется"
+          if BACKUP_PASSPHRASE=wrong-passphrase-0123456789 backup/restore.sh latest "postgresql://$DB_USER:app@127.0.0.1:55432/restore_check"; then
+            echo "::error::копия открылась неверным паролем"; exit 1
+          fi
+          echo "::endgroup::"
+
+      - name: Сайт после восстановления
+        run: docker/smoke.sh check
+
+      - name: Логи при ошибке
+        if: failure()
+        run: |
+          docker compose ps -a || true
+          docker compose logs --tail 200 || true

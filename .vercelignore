@@ -3,3 +3,13 @@ index.backup.html
 DEPLOY.md
 .env.local
 .env
+Dockerfile
+.dockerignore
+compose.yaml
+docker
+docker.env
+docker.env.example
+backup
+backups
+BACKUP.md
+.gitattributes

@@ -1,0 +1,48 @@
+# SmartHub целиком на своём сервере: сайт + API заявок + собственная база.
+# Запасной вариант на случай, если Vercel или база недоступны — см. BACKUP.md.
+#
+#   cp docker.env.example docker.env   # и заполнить
+#   docker compose up -d --build
+#
+# Сайт слушает только 127.0.0.1:3105 — наружу его отдаёт Caddy/nginx с HTTPS.
+# DATABASE_URL здесь намеренно не берётся из окружения: контейнер всегда
+# работает со своей базой и не может случайно подключиться к боевой.
+
+name: smarthub
+
+services:
+  db:
+    image: postgres:${POSTGRES_MAJOR:-17}
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: app
+      POSTGRES_DB: app
+      PGDATA: /var/lib/postgresql/data
+    volumes:
+      - db-data:/var/lib/postgresql/data
+      - ./docker/db-init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U app -d app"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+
+  # Таблицы lib/store.js создаёт сам при первом обращении.
+  app:
+    build: .
+    image: smarthub-app
+    restart: unless-stopped
+    env_file: docker.env
+    environment:
+      DATABASE_URL: postgresql://app:app@db:5432/app
+      # TLS к базе включён (docker/db-init/10-tls.sh), сертификат самоподписанный.
+      PGSSL_NO_VERIFY: "1"
+    ports:
+      - "127.0.0.1:${APP_PORT:-3105}:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  db-data:
