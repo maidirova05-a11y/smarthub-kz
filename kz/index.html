@@ -208,6 +208,16 @@
       color: var(--purple); border-color: var(--purple);
     }
     .btn-sm { height: 42px; padding: 0 18px; font-size: 14px; }
+    /* header CTA: keep "Пробный урок →" on one line — the arrow used to drop
+       onto a second line inside the 42px pill on narrower desktops */
+    .nav-desktop-cta { white-space: nowrap; flex-shrink: 0; padding: 0 16px; }
+    /* …and win the room for it back from the link padding and pill gaps */
+    .nav-pill { gap: 16px; }
+    .nav-links a { padding: 8px 9px; }
+    .nav-right { gap: 8px; }
+    /* between the burger breakpoint and ~1280px the bar is still too tight for
+       the phone number as well; it stays in the hero, contacts and footer */
+    @media (max-width: 1279px) { .nav-phone { display: none; } }
 
     /* ─────────── chips (ref: h40 pill, #712FEE text) ─────────── */
     .chip, .pl-grade {
@@ -626,6 +636,10 @@
     .price-card.feat .price-feats li { color: var(--on-dark-2); }
     .pf-check { width: 15px; height: 15px; margin-top: 4px; border-radius: var(--r-pill); background: var(--blue); }
     .price-card .btn { margin-top: auto; }
+    /* the outline CTA on the light cards had a hairline border the same tone
+       as the card, so it read as plain text; give it a white fill and an edge */
+    .price-card:not(.feat) .btn-outline { background: #fff; border-color: rgba(10,8,32,.14); }
+    .price-card:not(.feat) .btn-outline:hover { border-color: var(--purple); color: var(--purple); }
 
     /* ── corner-arrow card (Uiverse pattern, repainted in brand colours) ──
        The circle sits at z-index:-1 so it paints over the card background
