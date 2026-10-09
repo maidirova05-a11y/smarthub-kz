@@ -15,7 +15,7 @@ COPY api ./api
 COPY lib ./lib
 COPY docker/serve.mjs ./docker/serve.mjs
 # Сам сайт — только это доступно по URL.
-COPY *.html robots.txt sitemap.xml site.webmanifest ./public/
+COPY *.html favicon.ico robots.txt sitemap.xml site.webmanifest ./public/
 COPY en ./public/en
 COPY kz ./public/kz
 COPY assets ./public/assets
