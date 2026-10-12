@@ -337,10 +337,18 @@ pages.append(
     '    <priority>0.3</priority>\n'
     '  </url>' % (SITE, LASTMOD))
 
+pages.append(
+    '  <url>\n'
+    '    <loc>%s/oferta</loc>\n'
+    '    <lastmod>%s</lastmod>\n'
+    '    <changefreq>yearly</changefreq>\n'
+    '    <priority>0.3</priority>\n'
+    '  </url>' % (SITE, LASTMOD))
+
 sitemap = ('<?xml version="1.0" encoding="UTF-8"?>\n'
            '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"\n'
            '        xmlns:xhtml="http://www.w3.org/1999/xhtml">\n'
            + '\n'.join(pages) + '\n</urlset>\n')
 open(os.path.join(ROOT, 'sitemap.xml'), 'w', encoding='utf-8').write(sitemap)
-print('  sitemap.xml   страниц %d' % (len(TARGETS) + 1))
+print('  sitemap.xml   страниц %d' % (len(TARGETS) + 2))
 print('Готово.')

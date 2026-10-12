@@ -40,7 +40,7 @@ expect() { # expect <код> <путь> [curl-аргументы…]
 }
 
 echo "smarthub: $BASE"
-for p in / /en /kz /privacy /admin /robots.txt /sitemap.xml /assets/logo.png; do expect 200 "$p"; done
+for p in / /en /kz /privacy /oferta /admin /robots.txt /sitemap.xml /assets/logo.png; do expect 200 "$p"; done
 expect 308 /en/
 expect 308 /privacy.html
 # Код функций и служебные файлы по URL недоступны.

@@ -35,6 +35,7 @@ const PAGES = [
   ['/en',      'en/index.html',  { indexable: true, lang: 'en' }],
   ['/kz',      'kz/index.html',  { indexable: true, lang: 'kk' }],
   ['/privacy', 'privacy.html',   { indexable: true, lang: 'ru' }],
+  ['/oferta',  'oferta.html',    { indexable: true, lang: 'ru' }],
 ];
 /* ─────────────────────────────────────────────────────────────────────────
  * Общая часть проверки. Ниже, под ── НАСТРОЙКИ ──, лежит всё, что отличает
