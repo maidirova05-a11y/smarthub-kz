@@ -19,7 +19,7 @@ SITE = 'https://smarthub-kz.com'
 # НЕ дата сборки: lastmod, который меняется на каждый деплой, поисковик
 # перестаёт учитывать — он видит «изменение» без единой правки текста.
 # Правьте вручную вместе с содержимым.
-LASTMOD = '2026-09-26'
+LASTMOD = '2026-10-12'
 
 # Подтверждение прав на сайт в Google Search Console и Яндекс.Вебмастере.
 #
@@ -241,6 +241,9 @@ def retarget_head(html, lang):
         for prop in ('og:description', 'twitter:description'):
             html = re.sub(r'((?:property|name)="%s" content=")[^"]*(")' % prop,
                           lambda m: m.group(1) + dic['seo.desc'] + m.group(2), html, count=1)
+    if 'seo.keywords' in dic:
+        html = re.sub(r'(<meta name="keywords" content=")[^"]*(")',
+                      lambda m: m.group(1) + dic['seo.keywords'] + m.group(2), html, count=1)
     if 'seo.ogtitle' in dic:
         for prop in ('og:title', 'twitter:title'):
             html = re.sub(r'((?:property|name)="%s" content=")[^"]*(")' % prop,
@@ -334,10 +337,18 @@ pages.append(
     '    <priority>0.3</priority>\n'
     '  </url>' % (SITE, LASTMOD))
 
+pages.append(
+    '  <url>\n'
+    '    <loc>%s/oferta</loc>\n'
+    '    <lastmod>%s</lastmod>\n'
+    '    <changefreq>yearly</changefreq>\n'
+    '    <priority>0.3</priority>\n'
+    '  </url>' % (SITE, LASTMOD))
+
 sitemap = ('<?xml version="1.0" encoding="UTF-8"?>\n'
            '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"\n'
            '        xmlns:xhtml="http://www.w3.org/1999/xhtml">\n'
            + '\n'.join(pages) + '\n</urlset>\n')
 open(os.path.join(ROOT, 'sitemap.xml'), 'w', encoding='utf-8').write(sitemap)
-print('  sitemap.xml   страниц %d' % (len(TARGETS) + 1))
+print('  sitemap.xml   страниц %d' % (len(TARGETS) + 2))
 print('Готово.')
