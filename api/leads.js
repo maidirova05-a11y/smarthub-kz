@@ -6,12 +6,14 @@ const CSV_COLUMNS = ['at', 'type', 'name', 'phone', 'email', 'program', 'message
 
 /**
  * One CSV cell. Quotes are doubled, and a value that a spreadsheet would run
- * as a formula (=, @, or a +/- that does not start a number) gets a leading
- * apostrophe — the classic CSV-injection fix; phone numbers keep their "+".
+ * as a formula (=, @, tab, CR, or a leading +/-) gets a leading apostrophe —
+ * the classic CSV-injection fix. The only +/- cell kept as is looks like a
+ * phone number from start to end, so "+7 700 …" survives while
+ * "+1+cmd|' /C calc'!A0" does not.
  */
 function cell(v) {
   let t = String(v == null ? '' : v);
-  if (/^[=@\t\r]/.test(t) || /^[+-](?![\d\s(])/.test(t)) t = `'${t}`;
+  if (/^[=@\t\r]/.test(t) || (/^[+-]/.test(t) && !/^[+-][\d\s().-]*$/.test(t))) t = `'${t}`;
   return `"${t.replace(/"/g, '""')}"`;
 }
 

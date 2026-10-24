@@ -361,7 +361,12 @@
     var cols = ['at', 'type', 'name', 'phone', 'email', 'program', 'message',
                 'utmSource', 'utmMedium', 'utmCampaign', 'utmContent', 'utmTerm', 'referrer', 'landing'];
     var rows = [cols.join(';')].concat(visible().map(function (l) {
-      return cols.map(function (c) { return '"' + String(l[c] == null ? '' : l[c]).replace(/"/g, '""') + '"'; }).join(';');
+      return cols.map(function (c) {
+        var t = String(l[c] == null ? '' : l[c]);
+        // same rule as /api/leads?format=csv: no cell may open as a formula
+        if (/^[=@\t\r]/.test(t) || (/^[+-]/.test(t) && !/^[+-][\d\s().-]*$/.test(t))) t = "'" + t;
+        return '"' + t.replace(/"/g, '""') + '"';
+      }).join(';');
     }));
     // BOM so Excel opens the Cyrillic correctly
     var blob = new Blob(['﻿' + rows.join('\r\n')], { type: 'text/csv;charset=utf-8' });
