@@ -2867,10 +2867,52 @@
     return el ? el.value.trim() : '';
   }
 
+  /*
+   * Marketing attribution. utm_* are read from the address on the first page
+   * of the visit together with the external referrer and that landing page,
+   * then kept in sessionStorage so they survive the /, /en and /kz hops
+   * (every language is its own URL) and the anchor jumps before the form is
+   * sent. A later tagged link replaces the record: the newest campaign gets
+   * the credit. sessionStorage is per tab and dies with it, so nothing is
+   * tracked across visits.
+   */
+  var ATTR_KEY = 'sh_attr';
+  var UTM_KEYS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'];
+  function readAttribution() {
+    var saved = null;
+    try { saved = JSON.parse(sessionStorage.getItem(ATTR_KEY) || 'null'); } catch (e) {}
+    if (saved && typeof saved !== 'object') saved = null;
+
+    var attr = {};
+    var tagged = false;
+    try {
+      var params = new URLSearchParams(location.search);
+      UTM_KEYS.forEach(function (k) {
+        var v = params.get(k);
+        if (v) { attr[k] = v.slice(0, 200); tagged = true; }
+      });
+    } catch (e) {}
+    if (saved && !tagged) return saved;
+
+    var ref = '';
+    try {
+      if (document.referrer && new URL(document.referrer).host !== location.host) ref = document.referrer;
+    } catch (e) {}
+    attr.referrer = (ref || (saved && saved.referrer) || '').slice(0, 200);
+    attr.landing = (location.pathname + location.search).slice(0, 200);
+    try { sessionStorage.setItem(ATTR_KEY, JSON.stringify(attr)); } catch (e) {}
+    return attr;
+  }
+  var ATTRIBUTION = readAttribution();
+
   function send(form, btn, payload) {
     var original = btn.textContent;
     btn.disabled = true;
     btn.textContent = t('form.sending', 'Отправляем…');
+
+    Object.keys(ATTRIBUTION).forEach(function (k) {
+      if (payload[k] == null && ATTRIBUTION[k]) payload[k] = ATTRIBUTION[k];
+    });
 
     fetch('/api/lead', {
       method: 'POST',
