@@ -15,11 +15,17 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SRC = os.path.join(ROOT, 'index.html')
 SITE = 'https://smarthub-kz.com'
 
-# Дата последнего содержательного изменения страниц, для <lastmod> в sitemap.
-# НЕ дата сборки: lastmod, который меняется на каждый деплой, поисковик
-# перестаёт учитывать — он видит «изменение» без единой правки текста.
-# Правьте вручную вместе с содержимым.
-LASTMOD = '2026-10-24'
+# Дата последнего содержательного изменения КАЖДОЙ страницы, для <lastmod>
+# в sitemap. НЕ дата сборки и не одна дата на всех: lastmod, который меняется
+# без правки текста, поисковик перестаёт учитывать — и тогда не замечает и
+# настоящих изменений. Правьте дату только той страницы, чей текст поменялся.
+LASTMOD = {
+    'ru': '2026-10-24',       # /
+    'en': '2026-10-25',       # /en
+    'kz': '2026-10-25',       # /kz
+    'privacy': '2026-10-12',  # /privacy
+    'oferta': '2026-10-12',   # /oferta
+}
 
 # Подтверждение прав на сайт в Google Search Console и Яндекс.Вебмастере.
 #
@@ -203,6 +209,67 @@ def faq_block(lang):
             + body.replace('\n', '\r\n') + '\r\n</script>\r\n')
 
 
+# ── микроразметка организации ─────────────────────────────────────────
+# Блок Organization в index.html написан по-русски. Для /en и /kz строки в
+# нём переводятся через ключи "ld.*" словаря I18N: русское значение ключа —
+# ровно та строка, что стоит в разметке, значение на другом языке — замена.
+# description берётся из seo.desc, inLanguage — по языку страницы.
+# alternateName не трогаем: это намеренно список названий на всех языках.
+# Строка с кириллицей, для которой ключа нет, валит сборку — иначе русский
+# текст молча утёк бы в английскую страницу, как это уже было.
+ORG_ID = SITE + '/#organization'
+ORG_RE = re.compile(r'(<script type="application/ld\+json">)(\r?\n)([\s\S]*?)(\r?\n</script>)')
+CYR = re.compile(r'[А-Яа-яЁё]')
+
+
+def localise_org(html, lang):
+    if lang == 'ru':
+        return html
+    dic = DICTS[lang]
+    code = {'ru': 'ru', 'en': 'en', 'kz': 'kk'}[lang]
+    by_ru = {}
+    for key, ru in DICTS['ru'].items():
+        if key.startswith('ld.'):
+            assert ru not in by_ru, 'ld-ключи %s и %s с одинаковым текстом' % (by_ru.get(ru), key)
+            assert key in dic, 'нет ключа %s в словаре %s' % (key, lang)
+            by_ru[ru] = key
+
+    def walk(node, field=None):
+        if isinstance(node, dict):
+            return {k: (code if k == 'inLanguage' and isinstance(v, str) else
+                        v if k == 'alternateName' else walk(v, k))
+                    for k, v in node.items()}
+        if isinstance(node, list):
+            return [walk(v, field) for v in node]
+        if isinstance(node, str) and CYR.search(node):
+            if node not in by_ru:
+                raise RuntimeError('нет ld-ключа для строки разметки (%s): %r' % (field, node))
+            return dic[by_ru[node]]
+        return node
+
+    def sub(m):
+        try:
+            doc = json.loads(m.group(3))
+        except ValueError:
+            return m.group(0)
+        if not isinstance(doc, dict) or doc.get('@id') != ORG_ID:
+            return m.group(0)
+        found.append(1)
+        # присваивание существующему ключу оставляет его на прежнем месте
+        if 'description' in doc:
+            doc['description'] = dic['seo.desc']
+        doc = {k: (v if k in ('description', 'alternateName') else walk(v, k))
+               for k, v in doc.items()}
+        eol = m.group(2)
+        body = json.dumps(doc, ensure_ascii=False, indent=2).replace('\n', eol)
+        return m.group(1) + eol + body + m.group(4)
+
+    found = []
+    html = ORG_RE.sub(sub, html)
+    assert len(found) == 1, 'блоков организации у %s: %d' % (lang, len(found))
+    return html
+
+
 def retarget_head(html, lang):
     path, folder, lang_attr, locale = TARGETS[lang]
     url = '%s/%s' % (SITE, path)
@@ -292,6 +359,7 @@ def build(lang):
     if lang != 'ru':
         html, n, missing = translate(html, DICTS[lang])
         html, np = translate_placeholders(html, DICTS[lang])
+        html = localise_org(html, lang)
     else:
         n, np, missing = 0, 0, []
     html = retarget_head(html, lang)
@@ -327,7 +395,7 @@ for lang, (path, _, _, _) in TARGETS.items():
         '    <lastmod>%s</lastmod>\n'
         '    <changefreq>weekly</changefreq>\n'
         '    <priority>%s</priority>\n'
-        '  </url>' % (SITE, path, alts, SITE, LASTMOD, '1.0' if lang == 'ru' else '0.9'))
+        '  </url>' % (SITE, path, alts, SITE, LASTMOD[lang], '1.0' if lang == 'ru' else '0.9'))
 
 pages.append(
     '  <url>\n'
@@ -335,7 +403,7 @@ pages.append(
     '    <lastmod>%s</lastmod>\n'
     '    <changefreq>yearly</changefreq>\n'
     '    <priority>0.3</priority>\n'
-    '  </url>' % (SITE, LASTMOD))
+    '  </url>' % (SITE, LASTMOD['privacy']))
 
 pages.append(
     '  <url>\n'
@@ -343,7 +411,7 @@ pages.append(
     '    <lastmod>%s</lastmod>\n'
     '    <changefreq>yearly</changefreq>\n'
     '    <priority>0.3</priority>\n'
-    '  </url>' % (SITE, LASTMOD))
+    '  </url>' % (SITE, LASTMOD['oferta']))
 
 sitemap = ('<?xml version="1.0" encoding="UTF-8"?>\n'
            '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"\n'
