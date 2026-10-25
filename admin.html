@@ -61,6 +61,8 @@
   input[type=checkbox]{width:16px;height:16px;accent-color:var(--red);cursor:pointer}
   th.pick,td.pick{width:34px}
   .msg{max-width:340px;color:var(--text-2);font-weight:300}
+  .src{max-width:150px;font-size:12px;line-height:1.35;color:var(--text-2);word-break:break-word}
+  .src b{display:block;font-weight:500;color:var(--text)}
   .empty{padding:60px 20px;text-align:center;color:var(--text-3)}
   .warn{margin-bottom:18px;padding:13px 16px;border-radius:12px;
         background:#FFF4E5;color:#7A4A00;font-size:13px;line-height:1.5}
@@ -93,7 +95,8 @@
     <span class="muted" id="liveText">подключение…</span>
     <div class="grow"></div>
     <button class="btn" id="refresh">Обновить</button>
-    <button class="btn" id="csv">Выгрузить CSV</button>
+    <button class="btn" id="csv" title="Строки, которые сейчас видны в таблице">CSV: таблица</button>
+    <a class="btn" id="csvAll" href="/api/leads?format=csv" download title="Все заявки из базы, включая источники">CSV: всё</a>
     <button class="btn" id="logout">Выйти</button>
   </div>
 
@@ -134,7 +137,7 @@
       <thead><tr>
         <th class="pick"><input type="checkbox" id="pickAll" title="Выбрать все"></th>
         <th class="nowrap">Когда</th><th>Тип</th><th>Имя</th><th>Телефон</th>
-        <th>Почта</th><th>Программа</th><th>Сообщение</th><th class="actions"></th>
+        <th>Почта</th><th>Программа</th><th>Сообщение</th><th>Источник</th><th class="actions"></th>
       </tr></thead>
       <tbody id="rows"></tbody>
     </table>
@@ -235,6 +238,20 @@
     });
   }
 
+  /* "utm_source / utm_medium" with the campaign under it; without tags, the
+     site the visitor came from; a visit with neither is a direct one. */
+  function sourceCell(l) {
+    var top = [l.utmSource, l.utmMedium].filter(Boolean).join(' / ');
+    var sub = [l.utmCampaign, l.utmContent, l.utmTerm].filter(Boolean).join(' · ');
+    if (!top && l.referrer) {
+      try { top = new URL(l.referrer).host.replace(/^www\./, ''); } catch (e) { top = l.referrer; }
+    }
+    if (!top) return '<span class="muted">прямой</span>';
+    var title = [l.referrer && 'Переход с: ' + l.referrer, l.landing && 'Первая страница: ' + l.landing]
+      .filter(Boolean).join('\n');
+    return '<div class="src" title="' + esc(title) + '"><b>' + esc(top) + '</b>' + esc(sub) + '</div>';
+  }
+
   function inPeriod(l) {
     if (period === 'all') return true;
     var t = new Date(l.at).getTime();
@@ -247,7 +264,8 @@
       if (filter !== 'all' && l.type !== filter) return false;
       if (!inPeriod(l)) return false;
       if (!query) return true;
-      return [l.name, l.phone, l.email, l.program, l.message]
+      return [l.name, l.phone, l.email, l.program, l.message,
+              l.utmSource, l.utmMedium, l.utmCampaign, l.utmContent, l.utmTerm, l.referrer]
         .join(' ').toLowerCase().indexOf(query) !== -1;
     });
   }
@@ -321,6 +339,7 @@
         '<td>' + (l.email ? '<a href="mailto:' + esc(l.email) + '">' + esc(l.email) + '</a>' : '—') + '</td>' +
         '<td>' + esc(l.program || '—') + '</td>' +
         '<td class="msg">' + esc(l.message || '') + '</td>' +
+        '<td>' + sourceCell(l) + '</td>' +
         '<td class="actions"><button class="icon-btn" data-del="' + esc(l.id) +
           '" title="Удалить заявку">&times;</button></td>' +
       '</tr>';
@@ -339,9 +358,15 @@
 
   /* ── export ── */
   document.getElementById('csv').addEventListener('click', function () {
-    var cols = ['at', 'type', 'name', 'phone', 'email', 'program', 'message'];
+    var cols = ['at', 'type', 'name', 'phone', 'email', 'program', 'message',
+                'utmSource', 'utmMedium', 'utmCampaign', 'utmContent', 'utmTerm', 'referrer', 'landing'];
     var rows = [cols.join(';')].concat(visible().map(function (l) {
-      return cols.map(function (c) { return '"' + String(l[c] == null ? '' : l[c]).replace(/"/g, '""') + '"'; }).join(';');
+      return cols.map(function (c) {
+        var t = String(l[c] == null ? '' : l[c]);
+        // same rule as /api/leads?format=csv: no cell may open as a formula
+        if (/^[=@\t\r]/.test(t) || (/^[+-]/.test(t) && !/^[+-][\d\s().-]*$/.test(t))) t = "'" + t;
+        return '"' + t.replace(/"/g, '""') + '"';
+      }).join(';');
     }));
     // BOM so Excel opens the Cyrillic correctly
     var blob = new Blob(['﻿' + rows.join('\r\n')], { type: 'text/csv;charset=utf-8' });

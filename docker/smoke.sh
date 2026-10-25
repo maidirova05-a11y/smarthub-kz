@@ -50,7 +50,7 @@ for p in /api/lead.js /lib/store.js /package.json /vercel.json; do expect 404 "$
 NAME="Проверка Докер $RANDOM"
 expect 200 /api/lead -X POST -H "Origin: $BASE" -H 'Content-Type: application/json' \
   -H "X-Real-IP: 198.51.100.$((RANDOM % 250))" \
-  --data "{\"name\":\"$NAME\",\"phone\":\"+7 701 555 44 33\",\"consent\":true}"
+  --data "{\"name\":\"$NAME\",\"phone\":\"+7 701 555 44 33\",\"consent\":true,\"elapsed\":5000}"
 
 if [ -n "${SMOKE_ADMIN_PASSWORD:-}" ] || grep -qx "$CI_MARK" docker.env; then
   COOKIE=$(curl -s -D - -o /dev/null -X POST "$BASE/api/login" -H "Origin: $BASE" -H 'Content-Type: application/json' \

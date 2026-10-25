@@ -1,5 +1,28 @@
 // Admin-only feed of submissions. The panel polls GET; DELETE removes rows.
-import { listLeads, deleteLeads, isAuthed, dbConfigured, sameOrigin } from '../lib/store.js';
+// GET ?format=csv hands the same rows over as a spreadsheet download.
+import { listLeads, deleteLeads, isAuthed, dbConfigured, sameOrigin, ATTRIBUTION_FIELDS } from '../lib/store.js';
+
+const CSV_COLUMNS = ['at', 'type', 'name', 'phone', 'email', 'program', 'message', 'lang', 'page', ...ATTRIBUTION_FIELDS];
+
+/**
+ * One CSV cell. Quotes are doubled, and a value that a spreadsheet would run
+ * as a formula (=, @, tab, CR, or a leading +/-) gets a leading apostrophe —
+ * the classic CSV-injection fix. The only +/- cell kept as is looks like a
+ * phone number from start to end, so "+7 700 …" survives while
+ * "+1+cmd|' /C calc'!A0" does not.
+ */
+function cell(v) {
+  let t = String(v == null ? '' : v);
+  if (/^[=@\t\r]/.test(t) || (/^[+-]/.test(t) && !/^[+-][\d\s().-]*$/.test(t))) t = `'${t}`;
+  return `"${t.replace(/"/g, '""')}"`;
+}
+
+function toCsv(leads) {
+  const lines = [CSV_COLUMNS.join(';')];
+  for (const l of leads) lines.push(CSV_COLUMNS.map(c => cell(l[c])).join(';'));
+  // BOM so Excel opens the Cyrillic correctly; semicolons for its ru/kk locale
+  return '\uFEFF' + lines.join('\r\n') + '\r\n';
+}
 
 export default async function handler(req, res) {
   if (!isAuthed(req)) return res.status(401).json({ ok: false, error: 'unauthorised' });
@@ -34,10 +57,17 @@ export default async function handler(req, res) {
     return res.status(405).json({ ok: false, error: 'method_not_allowed' });
   }
 
-  const limit = Math.min(Math.max(parseInt(req.query.limit, 10) || 200, 1), 500);
+  const csv = String(req.query.format || '').toLowerCase() === 'csv';
+  const limit = Math.min(Math.max(parseInt(req.query.limit, 10) || (csv ? 500 : 200), 1), 500);
   try {
     const leads = await listLeads(limit);
     res.setHeader('Cache-Control', 'no-store');
+    if (csv) {
+      const day = new Date().toISOString().slice(0, 10);
+      res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+      res.setHeader('Content-Disposition', `attachment; filename="smarthub-leads-${day}.csv"`);
+      return res.status(200).send(toCsv(leads));
+    }
     return res.status(200).json({ ok: true, leads, persistent: dbConfigured });
   } catch (err) {
     console.error('lead read failed:', err);

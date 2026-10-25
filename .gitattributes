@@ -1,2 +1,14 @@
 # Скрипты запускаются в Linux (Docker, CI, сервер) — только LF.
 *.sh text eol=lf
+
+# Исходники — тоже LF. Без явного text git однажды счёл api/lead.js (CRLF)
+# бинарным и показывал в diff только «Bin». *.html сюда намеренно не входит:
+# index.html и собранные из него en/ и kz/ исторически со смешанными
+# переводами строк, и нормализация переписала бы тысячи строк без единой
+# правки содержимого.
+*.js   text eol=lf
+*.mjs  text eol=lf
+*.py   text eol=lf
+*.json text eol=lf
+*.css  text eol=lf
+*.md   text eol=lf
