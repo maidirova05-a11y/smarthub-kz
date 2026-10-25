@@ -43,9 +43,11 @@ export default async function handler(req, res) {
   // 1. honeypot: a field real people never see
   if (clean(body.company)) return quiet();
 
-  // 2. filled impossibly fast → script, not a person
-  const elapsed = Number(body.elapsed);
-  if (Number.isFinite(elapsed) && elapsed >= 0 && elapsed < MIN_FILL_MS) return quiet();
+  // 2. filled impossibly fast → script, not a person. Both forms on the site
+  // always send `elapsed`, so a request without a usable number did not come
+  // from our page — it is a script posting directly and gets the same answer.
+  const elapsed = typeof body.elapsed === 'number' ? body.elapsed : NaN;
+  if (!Number.isFinite(elapsed) || elapsed < MIN_FILL_MS) return quiet();
 
   // 3. links in the message are the classic spam payload
   if (/https?:\/\/|<a\s|\[url/i.test(String(body.message || ''))) return quiet();
