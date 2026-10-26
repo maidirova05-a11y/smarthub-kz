@@ -2188,10 +2188,19 @@
     hoverScale: 1.06, parallax: 0.04, clickBurst: false
   };
 
-  var gl = null;
+  // failIfMajorPerformanceCaveat: no context when WebGL would run in software
+  // (no GPU, blocklisted driver). There every frame of the shader costs the
+  // main thread hundreds of milliseconds, so such devices get one still frame
+  // — the same fallback as prefers-reduced-motion below.
+  var gl = null, software = false;
   try {
-    var attrs = { alpha: true, antialias: false, premultipliedAlpha: false };
+    var attrs = { alpha: true, antialias: false, premultipliedAlpha: false, failIfMajorPerformanceCaveat: true };
     gl = canvas.getContext('webgl2', attrs) || canvas.getContext('webgl', attrs);
+    if (!gl) {
+      software = true;
+      attrs.failIfMajorPerformanceCaveat = false;
+      gl = canvas.getContext('webgl2', attrs) || canvas.getContext('webgl', attrs);
+    }
   } catch (e) { return; }
   if (!gl) return;
 
@@ -2358,7 +2367,7 @@
   }
 
   // A static frame is enough when the user asked for less motion.
-  var still = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var still = software || (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
   if (still) { draw(600); return; }
 
   // Don't burn GPU while the hero is scrolled out of view or the tab is hidden.
