@@ -22,8 +22,10 @@ lib/bitrix.js         создание сделки в воронке Битри
 
 tools/build-langs.py  сборка en/ и kz/ из index.html + sitemap.xml
 tools/check-seo.mjs   проверка собранных страниц глазами краулера
+tools/optimize-images.mjs  AVIF/WebP и уменьшенные логотипы из assets/
 llms.txt              краткое описание сайта для ИИ-краулеров
 assets/               логотипы, иконки, изображения секций
+assets/fonts/         Google Sans (OFL) — свои копии вместо fonts.googleapis.com
 ```
 
 ## Переменные окружения
@@ -76,6 +78,17 @@ node tools/check-seo.mjs
 Ключевые слова, описания и вопросы FAQ для всех языков лежат в словаре
 `I18N` (`seo.*`, `faq.*`) — FAQ-разметка собирается из него же.
 Правки напрямую в `en/` и `kz/` затрутся при следующей сборке.
+
+## Картинки
+
+Фото секций отдаются как AVIF/WebP с JPG-запасным, логотипы — WebP и
+уменьшенные копии под `srcset`. Заменили картинку в `assets/` — пересоберите
+копии и поднимите `?v=` у ссылок в `index.html` (`/assets/*` кэшируется
+браузером на год), затем `build-langs.py`:
+
+```bash
+npm i --no-save sharp@0.35.5 && node tools/optimize-images.mjs
+```
 
 ## Деплой
 

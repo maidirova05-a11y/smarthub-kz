@@ -399,6 +399,11 @@
       border-radius: 16px;
     }
     .logo { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+    /* <picture> adds no box: the <img> stays the flex item it was. <source>
+       is not display:none by default, so hide it, or it becomes an empty
+       flex item and costs a gap. */
+    picture.pic { display: contents; }
+    picture.pic > source { display: none; }
     .logo img { height: 40px; width: auto; display: block; }
     footer .logo img { height: 52px; }
     @media (max-width: 720px) { .logo img { height: 32px; } }
@@ -914,6 +919,13 @@
       background-position: center;
       z-index: 0;
     }
+    /* AVIF/WebP where image-set() type() is understood; JPG otherwise */
+    @supports (background-image: image-set(url("x.avif") type("image/avif"))) {
+      .stack-card::before { background-image: var(--card-set); }
+    }
+    /* photos load only once the section is near (script: "lazy backgrounds") */
+    .js [data-lazy-bg]:not(.bg-on) .stack-card::before,
+    .js [data-lazy-bg]:not(.bg-on) .mas-photo { background-image: none !important; }
     .stack-card::after {
       content: "";
       position: absolute; inset: 0;
@@ -1178,7 +1190,7 @@
   <div class="container">
     <div class="nav-pill">
       <a href="#hero" class="logo">
-        <img src="assets/logo.png?v=2" alt="SmartHub Robotics &amp; Drone Academy" width="900" height="372">
+        <picture class="pic"><source type="image/webp" srcset="assets/logo-225.webp?v=2 225w, assets/logo-450.webp?v=2 450w, assets/logo.webp?v=2 900w" sizes="(max-width: 720px) 78px, 97px"><img src="assets/logo.png?v=2" srcset="assets/logo-225.png?v=2 225w, assets/logo-450.png?v=2 450w, assets/logo.png?v=2 900w" sizes="(max-width: 720px) 78px, 97px" alt="SmartHub Robotics &amp; Drone Academy" width="900" height="372" decoding="async"></picture>
       </a>
       <ul class="nav-links">
         <li><a href="#programs" data-i18n="nav.programs">Programs</a></li>
@@ -1227,7 +1239,7 @@
 
     <div class="hero-stage">
       <h1 class="hero-title d1" data-i18n="hero.title">Where Future <span class='hl'>Engineers Are Born</span></h1>
-      <img class="hero-logo" src="assets/logo-light.png?v=2" alt="SmartHub Robotics &amp; Drone Academy" width="900" height="372">
+      <picture class="pic"><source type="image/webp" srcset="assets/logo-light-450.webp?v=2 450w, assets/logo-light.webp?v=2 900w" sizes="(max-width: 600px) 240px, (max-width: 1300px) 40vw, 520px"><img class="hero-logo" src="assets/logo-light.png?v=2" srcset="assets/logo-light-450.png?v=2 450w, assets/logo-light.png?v=2 900w" sizes="(max-width: 600px) 240px, (max-width: 1300px) 40vw, 520px" alt="SmartHub Robotics &amp; Drone Academy" width="900" height="372" fetchpriority="high"></picture>
       <div class="hero-cta">
         <div class="sp">
           <a href="#register" class="sparkle-button">
@@ -1303,45 +1315,45 @@
       </div>
       <p class="sec-desc" data-i18n="mat.desc">Robots, drones, controllers and sensors — students train on exactly the equipment used at real competitions.</p>
     </div>
-    <div class="scroll-stack" id="matStack">
+    <div class="scroll-stack" id="matStack" data-lazy-bg>
       <div class="scroll-stack-inner">
         <div class="scroll-stack-card">
-          <article class="stack-card" style="--card-img:url(&quot;assets/equip-lego.jpg&quot;)">
+          <article class="stack-card" style="--card-img:url(&quot;assets/equip-lego.jpg?v=1&quot;);--card-set:image-set(url(&quot;assets/equip-lego.avif?v=1&quot;) type(&quot;image/avif&quot;), url(&quot;assets/equip-lego.webp?v=1&quot;) type(&quot;image/webp&quot;), url(&quot;assets/equip-lego.jpg?v=1&quot;) type(&quot;image/jpeg&quot;))">
             <span class="stack-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="8" width="16" height="12" rx="3"/><path d="M12 4v4M9 14h.01M15 14h.01"/></svg></span>
             <div class="stack-title">LEGO SPIKE</div>
             <div class="stack-sub" data-i18n="mat.1">Prime & WeDo 2.0</div>
           </article>
         </div>
         <div class="scroll-stack-card">
-          <article class="stack-card" style="--card-img:url(&quot;assets/equip-arduino.jpg&quot;)">
+          <article class="stack-card" style="--card-img:url(&quot;assets/equip-arduino.jpg?v=1&quot;);--card-set:image-set(url(&quot;assets/equip-arduino.avif?v=1&quot;) type(&quot;image/avif&quot;), url(&quot;assets/equip-arduino.webp?v=1&quot;) type(&quot;image/webp&quot;), url(&quot;assets/equip-arduino.jpg?v=1&quot;) type(&quot;image/jpeg&quot;))">
             <span class="stack-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="7" width="10" height="10" rx="2"/><path d="M10 3v4M14 3v4M10 17v4M14 17v4M3 10h4M3 14h4M17 10h4M17 14h4"/></svg></span>
             <div class="stack-title">Arduino</div>
             <div class="stack-sub" data-i18n="mat.2">Microcontrollers</div>
           </article>
         </div>
         <div class="scroll-stack-card">
-          <article class="stack-card" style="--card-img:url(&quot;assets/equip-drones.jpg&quot;)">
+          <article class="stack-card" style="--card-img:url(&quot;assets/equip-drones.jpg?v=1&quot;);--card-set:image-set(url(&quot;assets/equip-drones.avif?v=1&quot;) type(&quot;image/avif&quot;), url(&quot;assets/equip-drones.webp?v=1&quot;) type(&quot;image/webp&quot;), url(&quot;assets/equip-drones.jpg?v=1&quot;) type(&quot;image/jpeg&quot;))">
             <span class="stack-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="6" height="6" rx="1.5"/><circle cx="5" cy="5" r="2.5"/><circle cx="19" cy="5" r="2.5"/><circle cx="5" cy="19" r="2.5"/><circle cx="19" cy="19" r="2.5"/><path d="M6.8 6.8 9 9M17.2 6.8 15 9M6.8 17.2 9 15M17.2 17.2 15 15"/></svg></span>
             <div class="stack-title" data-i18n="mat.3n">Drones</div>
             <div class="stack-sub" data-i18n="mat.3">Racing & FPV</div>
           </article>
         </div>
         <div class="scroll-stack-card">
-          <article class="stack-card" style="--card-img:url(&quot;assets/equip-sensors.jpg&quot;)">
+          <article class="stack-card" style="--card-img:url(&quot;assets/equip-sensors.jpg?v=1&quot;);--card-set:image-set(url(&quot;assets/equip-sensors.avif?v=1&quot;) type(&quot;image/avif&quot;), url(&quot;assets/equip-sensors.webp?v=1&quot;) type(&quot;image/webp&quot;), url(&quot;assets/equip-sensors.jpg?v=1&quot;) type(&quot;image/jpeg&quot;))">
             <span class="stack-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20v-6"/><circle cx="12" cy="11" r="2"/><path d="M8.5 7.5a5 5 0 0 1 7 0M5.5 4.5a9 9 0 0 1 13 0"/></svg></span>
             <div class="stack-title" data-i18n="mat.4n">Sensors</div>
             <div class="stack-sub" data-i18n="mat.4">IoT & sensors</div>
           </article>
         </div>
         <div class="scroll-stack-card">
-          <article class="stack-card" style="--card-img:url(&quot;assets/equip-mechanics.jpg&quot;)">
+          <article class="stack-card" style="--card-img:url(&quot;assets/equip-mechanics.jpg?v=1&quot;);--card-set:image-set(url(&quot;assets/equip-mechanics.avif?v=1&quot;) type(&quot;image/avif&quot;), url(&quot;assets/equip-mechanics.webp?v=1&quot;) type(&quot;image/webp&quot;), url(&quot;assets/equip-mechanics.jpg?v=1&quot;) type(&quot;image/jpeg&quot;))">
             <span class="stack-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9 17 7M7 17l-2.1 2.1"/></svg></span>
             <div class="stack-title" data-i18n="mat.5n">Mechanics</div>
             <div class="stack-sub" data-i18n="mat.5">Motors & drives</div>
           </article>
         </div>
         <div class="scroll-stack-card">
-          <article class="stack-card" style="--card-img:url(&quot;assets/equip-code.jpg&quot;)">
+          <article class="stack-card" style="--card-img:url(&quot;assets/equip-code.jpg?v=1&quot;);--card-set:image-set(url(&quot;assets/equip-code.avif?v=1&quot;) type(&quot;image/avif&quot;), url(&quot;assets/equip-code.webp?v=1&quot;) type(&quot;image/webp&quot;), url(&quot;assets/equip-code.jpg?v=1&quot;) type(&quot;image/jpeg&quot;))">
             <span class="stack-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m8 8-4 4 4 4M16 8l4 4-4 4M14 4l-4 16"/></svg></span>
             <div class="stack-title" data-i18n="mat.6n">Programming</div>
             <div class="stack-sub" data-i18n="mat.6">Scratch → Python</div>
@@ -1446,85 +1458,85 @@
       </div>
       <p class="sec-desc" data-i18n="ach.desc">Our students compete against the best — and win. Here are the landmarks that prove SmartHub's methodology works at the highest level.</p>
     </div>
-    <div class="mas" id="achMasonry">
+    <div class="mas" id="achMasonry" data-lazy-bg>
         <article class="mas-item" data-h="300">
-          <div class="mas-photo" style="background-image:url(&quot;assets/ach-1.jpg&quot;)"></div>
+          <div class="mas-photo" style="background-image:url(&quot;assets/ach-1.jpg?v=1&quot;);background-image:image-set(url(&quot;assets/ach-1.avif?v=1&quot;) type(&quot;image/avif&quot;), url(&quot;assets/ach-1.webp?v=1&quot;) type(&quot;image/webp&quot;), url(&quot;assets/ach-1.jpg?v=1&quot;) type(&quot;image/jpeg&quot;))"></div>
           <div class="mas-body"><span class="ach-tag" data-i18n="yr.p1">1st place</span><h3 class="ach-title">Robotek Grand Tournament</h3><div class="ach-event" data-i18n="yr.e1">International stage · “Delivery” category</div><div class="yr-names">Амангельдиев Ерали · Қуан Кайсар</div></div>
         </article>
         <article class="mas-item" data-h="380">
-          <div class="mas-photo" style="background-image:url(&quot;assets/ach-2.jpg&quot;)"></div>
+          <div class="mas-photo" style="background-image:url(&quot;assets/ach-2.jpg?v=1&quot;);background-image:image-set(url(&quot;assets/ach-2.avif?v=1&quot;) type(&quot;image/avif&quot;), url(&quot;assets/ach-2.webp?v=1&quot;) type(&quot;image/webp&quot;), url(&quot;assets/ach-2.jpg?v=1&quot;) type(&quot;image/jpeg&quot;))"></div>
           <div class="mas-body"><span class="ach-tag" data-i18n="yr.p2">2nd place</span><h3 class="ach-title">Fibonacci International Robotics Olympiad</h3><div class="ach-event" data-i18n="yr.e2">Autonomous Car Racing · middle school</div><div class="yr-names">Войтович Тимофей · Тажикенова Сальма</div></div>
         </article>
         <article class="mas-item" data-h="260">
-          <div class="mas-photo" style="background-image:url(&quot;assets/ach-3.jpg&quot;)"></div>
+          <div class="mas-photo" style="background-image:url(&quot;assets/ach-3.jpg?v=1&quot;);background-image:image-set(url(&quot;assets/ach-3.avif?v=1&quot;) type(&quot;image/avif&quot;), url(&quot;assets/ach-3.webp?v=1&quot;) type(&quot;image/webp&quot;), url(&quot;assets/ach-3.jpg?v=1&quot;) type(&quot;image/jpeg&quot;))"></div>
           <div class="mas-body"><span class="ach-tag" data-i18n="yr.p2">2nd place</span><h3 class="ach-title">Fibonacci International Robotics Olympiad</h3><div class="ach-event" data-i18n="yr.e3">Autonomous Car Racing · elementary school</div><div class="yr-names">Тимохин Марк · Шалқар Зулхар</div></div>
         </article>
         <article class="mas-item" data-h="340">
-          <div class="mas-photo" style="background-image:url(&quot;assets/ach-4.jpg&quot;)"></div>
+          <div class="mas-photo" style="background-image:url(&quot;assets/ach-4.jpg?v=1&quot;);background-image:image-set(url(&quot;assets/ach-4.avif?v=1&quot;) type(&quot;image/avif&quot;), url(&quot;assets/ach-4.webp?v=1&quot;) type(&quot;image/webp&quot;), url(&quot;assets/ach-4.jpg?v=1&quot;) type(&quot;image/jpeg&quot;))"></div>
           <div class="mas-body"><span class="ach-tag" data-i18n="yr.p2">2nd place</span><h3 class="ach-title">Fibonacci International Robotics Olympiad</h3><div class="ach-event" data-i18n="yr.e4">Lego Line Following · elementary school</div><div class="yr-names">Тимохин Марк · Шалқар Зулхар</div></div>
         </article>
         <article class="mas-item" data-h="300">
-          <div class="mas-photo" style="background-image:url(&quot;assets/ach-5.jpg&quot;)"></div>
+          <div class="mas-photo" style="background-image:url(&quot;assets/ach-5.jpg?v=1&quot;);background-image:image-set(url(&quot;assets/ach-5.avif?v=1&quot;) type(&quot;image/avif&quot;), url(&quot;assets/ach-5.webp?v=1&quot;) type(&quot;image/webp&quot;), url(&quot;assets/ach-5.jpg?v=1&quot;) type(&quot;image/jpeg&quot;))"></div>
           <div class="mas-body"><span class="ach-tag" data-i18n="yr.p2">2nd place</span><h3 class="ach-title">World Robot Olympiad</h3><div class="ach-event" data-i18n="yr.e5">Regional stage · Robomission Elementary</div><div class="yr-names">Амангельдиев Ерали · Опабек Султан</div></div>
         </article>
         <article class="mas-item" data-h="420">
-          <div class="mas-photo" style="background-image:url(&quot;assets/ach-1.jpg&quot;)"></div>
+          <div class="mas-photo" style="background-image:url(&quot;assets/ach-1.jpg?v=1&quot;);background-image:image-set(url(&quot;assets/ach-1.avif?v=1&quot;) type(&quot;image/avif&quot;), url(&quot;assets/ach-1.webp?v=1&quot;) type(&quot;image/webp&quot;), url(&quot;assets/ach-1.jpg?v=1&quot;) type(&quot;image/jpeg&quot;))"></div>
           <div class="mas-body"><span class="ach-tag" data-i18n="yr.p2">2nd place</span><h3 class="ach-title">Fibonacci International Robotics Olympiad</h3><div class="ach-event" data-i18n="yr.e6">Autonomous Car Racing · elementary school</div><div class="yr-names">Ефимов Константин · Тё Роман</div></div>
         </article>
         <article class="mas-item" data-h="280">
-          <div class="mas-photo" style="background-image:url(&quot;assets/ach-2.jpg&quot;)"></div>
+          <div class="mas-photo" style="background-image:url(&quot;assets/ach-2.jpg?v=1&quot;);background-image:image-set(url(&quot;assets/ach-2.avif?v=1&quot;) type(&quot;image/avif&quot;), url(&quot;assets/ach-2.webp?v=1&quot;) type(&quot;image/webp&quot;), url(&quot;assets/ach-2.jpg?v=1&quot;) type(&quot;image/jpeg&quot;))"></div>
           <div class="mas-body"><span class="ach-tag" data-i18n="yr.p2">2nd place</span><h3 class="ach-title">Fibonacci International Robotics Olympiad</h3><div class="ach-event" data-i18n="yr.e7">Autonomous Car Racing · middle school</div><div class="yr-names">Кастнер Платон · Дан Габриэль</div></div>
         </article>
         <article class="mas-item" data-h="320">
-          <div class="mas-photo" style="background-image:url(&quot;assets/ach-3.jpg&quot;)"></div>
+          <div class="mas-photo" style="background-image:url(&quot;assets/ach-3.jpg?v=1&quot;);background-image:image-set(url(&quot;assets/ach-3.avif?v=1&quot;) type(&quot;image/avif&quot;), url(&quot;assets/ach-3.webp?v=1&quot;) type(&quot;image/webp&quot;), url(&quot;assets/ach-3.jpg?v=1&quot;) type(&quot;image/jpeg&quot;))"></div>
           <div class="mas-body"><span class="ach-tag" data-i18n="yr.p3">3rd place</span><h3 class="ach-title">Robotek Grand Tournament</h3><div class="ach-event" data-i18n="yr.e8">National stage · “Delivery” category</div><div class="yr-names">Амангельдиев Ерали · Қуан Қайсар</div></div>
         </article>
         <article class="mas-item" data-h="360">
-          <div class="mas-photo" style="background-image:url(&quot;assets/ach-4.jpg&quot;)"></div>
+          <div class="mas-photo" style="background-image:url(&quot;assets/ach-4.jpg?v=1&quot;);background-image:image-set(url(&quot;assets/ach-4.avif?v=1&quot;) type(&quot;image/avif&quot;), url(&quot;assets/ach-4.webp?v=1&quot;) type(&quot;image/webp&quot;), url(&quot;assets/ach-4.jpg?v=1&quot;) type(&quot;image/jpeg&quot;))"></div>
           <div class="mas-body"><span class="ach-tag" data-i18n="yr.award">Award</span><h3 class="ach-title">Vex IQ Energy Award</h3><div class="ach-event" data-i18n="yr.e9">Elementary school</div><div class="yr-names">Кайратова Амелия · Мансурова Дильназ · Садуахас Арлан · Амреев Аслан</div></div>
         </article>
         <article class="mas-item" data-h="260">
-          <div class="mas-photo" style="background-image:url(&quot;assets/ach-5.jpg&quot;)"></div>
+          <div class="mas-photo" style="background-image:url(&quot;assets/ach-5.jpg?v=1&quot;);background-image:image-set(url(&quot;assets/ach-5.avif?v=1&quot;) type(&quot;image/avif&quot;), url(&quot;assets/ach-5.webp?v=1&quot;) type(&quot;image/webp&quot;), url(&quot;assets/ach-5.jpg?v=1&quot;) type(&quot;image/jpeg&quot;))"></div>
           <div class="mas-body"><span class="ach-tag" data-i18n="yr.top5">Top 5</span><h3 class="ach-title">JasSkills Drone Soccer</h3><div class="ach-event" data-i18n="yr.e10">Drone soccer</div><div class="yr-names">Рашид Бекмухаммед · Хамит Санжар · Мулин Рамир · Дайнболов Айвар · Амреев Аслан</div></div>
         </article>
         <article class="mas-item" data-h="300">
-          <div class="mas-photo" style="background-image:url(&quot;assets/ach-1.jpg&quot;)"></div>
+          <div class="mas-photo" style="background-image:url(&quot;assets/ach-1.jpg?v=1&quot;);background-image:image-set(url(&quot;assets/ach-1.avif?v=1&quot;) type(&quot;image/avif&quot;), url(&quot;assets/ach-1.webp?v=1&quot;) type(&quot;image/webp&quot;), url(&quot;assets/ach-1.jpg?v=1&quot;) type(&quot;image/jpeg&quot;))"></div>
           <div class="mas-body"><span class="ach-tag" data-i18n="yr.multi">4 prize places</span><h3 class="ach-title">Astana Tech Cup</h3><div class="ach-event" data-i18n="yr.e11">National stage</div></div>
         </article>
         <article class="mas-item" data-h="380">
-          <div class="mas-photo" style="background-image:url(&quot;assets/ach-2.jpg&quot;)"></div>
+          <div class="mas-photo" style="background-image:url(&quot;assets/ach-2.jpg?v=1&quot;);background-image:image-set(url(&quot;assets/ach-2.avif?v=1&quot;) type(&quot;image/avif&quot;), url(&quot;assets/ach-2.webp?v=1&quot;) type(&quot;image/webp&quot;), url(&quot;assets/ach-2.jpg?v=1&quot;) type(&quot;image/jpeg&quot;))"></div>
           <div class="mas-body"><span class="ach-tag" data-i18n="ach.gold">Gold · 1st Place</span><h3 class="ach-title" data-i18n="ach.1t">World Championship — Autonomous Robots</h3><div class="ach-event" data-i18n="ach.1e">Turkey · 40+ competing countries</div></div>
         </article>
         <article class="mas-item" data-h="260">
-          <div class="mas-photo" style="background-image:url(&quot;assets/ach-3.jpg&quot;)"></div>
+          <div class="mas-photo" style="background-image:url(&quot;assets/ach-3.jpg?v=1&quot;);background-image:image-set(url(&quot;assets/ach-3.avif?v=1&quot;) type(&quot;image/avif&quot;), url(&quot;assets/ach-3.webp?v=1&quot;) type(&quot;image/webp&quot;), url(&quot;assets/ach-3.jpg?v=1&quot;) type(&quot;image/jpeg&quot;))"></div>
           <div class="mas-body"><span class="ach-tag" data-i18n="ach.gold">Gold · 1st Place</span><h3 class="ach-title" data-i18n="ach.2t">Asia Pacific International — Drone Racing</h3><div class="ach-event" data-i18n="ach.2e">Singapore · Asia Pacific Championship</div></div>
         </article>
         <article class="mas-item" data-h="340">
-          <div class="mas-photo" style="background-image:url(&quot;assets/ach-4.jpg&quot;)"></div>
+          <div class="mas-photo" style="background-image:url(&quot;assets/ach-4.jpg?v=1&quot;);background-image:image-set(url(&quot;assets/ach-4.avif?v=1&quot;) type(&quot;image/avif&quot;), url(&quot;assets/ach-4.webp?v=1&quot;) type(&quot;image/webp&quot;), url(&quot;assets/ach-4.jpg?v=1&quot;) type(&quot;image/jpeg&quot;))"></div>
           <div class="mas-body"><span class="ach-tag" data-i18n="ach.gold">Gold · 1st Place</span><h3 class="ach-title" data-i18n="ach.3t">Robotek Grand Tournament</h3><div class="ach-event" data-i18n="ach.3e">Kazakhstan · International Category</div></div>
         </article>
         <article class="mas-item" data-h="300">
-          <div class="mas-photo" style="background-image:url(&quot;assets/ach-5.jpg&quot;)"></div>
+          <div class="mas-photo" style="background-image:url(&quot;assets/ach-5.jpg?v=1&quot;);background-image:image-set(url(&quot;assets/ach-5.avif?v=1&quot;) type(&quot;image/avif&quot;), url(&quot;assets/ach-5.webp?v=1&quot;) type(&quot;image/webp&quot;), url(&quot;assets/ach-5.jpg?v=1&quot;) type(&quot;image/jpeg&quot;))"></div>
           <div class="mas-body"><span class="ach-tag" data-i18n="ach.silver">Silver · 2nd Place</span><h3 class="ach-title" data-i18n="ach.4t">World Robot Olympiad</h3><div class="ach-event" data-i18n="ach.4e">South Korea · Future Engineers</div></div>
         </article>
         <article class="mas-item" data-h="420">
-          <div class="mas-photo" style="background-image:url(&quot;assets/ach-1.jpg&quot;)"></div>
+          <div class="mas-photo" style="background-image:url(&quot;assets/ach-1.jpg?v=1&quot;);background-image:image-set(url(&quot;assets/ach-1.avif?v=1&quot;) type(&quot;image/avif&quot;), url(&quot;assets/ach-1.webp?v=1&quot;) type(&quot;image/webp&quot;), url(&quot;assets/ach-1.jpg?v=1&quot;) type(&quot;image/jpeg&quot;))"></div>
           <div class="mas-body"><span class="ach-tag" data-i18n="ach.top3">Top 3 · Houston Finals</span><h3 class="ach-title" data-i18n="ach.5t">First LEGO League World Festival</h3><div class="ach-event" data-i18n="ach.5e">Houston, USA · International Finals</div></div>
         </article>
         <article class="mas-item" data-h="280">
-          <div class="mas-photo" style="background-image:url(&quot;assets/ach-2.jpg&quot;)"></div>
+          <div class="mas-photo" style="background-image:url(&quot;assets/ach-2.jpg?v=1&quot;);background-image:image-set(url(&quot;assets/ach-2.avif?v=1&quot;) type(&quot;image/avif&quot;), url(&quot;assets/ach-2.webp?v=1&quot;) type(&quot;image/webp&quot;), url(&quot;assets/ach-2.jpg?v=1&quot;) type(&quot;image/jpeg&quot;))"></div>
           <div class="mas-body"><span class="ach-tag" data-i18n="ach.bronze">Bronze · 3rd Place</span><h3 class="ach-title" data-i18n="ach.6t">EuroBot Championship</h3><div class="ach-event" data-i18n="ach.6e">Belgium · Autonomous Robotics</div></div>
         </article>
         <article class="mas-item" data-h="320">
-          <div class="mas-photo" style="background-image:url(&quot;assets/ach-3.jpg&quot;)"></div>
+          <div class="mas-photo" style="background-image:url(&quot;assets/ach-3.jpg?v=1&quot;);background-image:image-set(url(&quot;assets/ach-3.avif?v=1&quot;) type(&quot;image/avif&quot;), url(&quot;assets/ach-3.webp?v=1&quot;) type(&quot;image/webp&quot;), url(&quot;assets/ach-3.jpg?v=1&quot;) type(&quot;image/jpeg&quot;))"></div>
           <div class="mas-body"><span class="ach-tag" data-i18n="ach.final">Finalists</span><h3 class="ach-title" data-i18n="ach.7t">RoboCup Junior — Rescue Maze</h3><div class="ach-event" data-i18n="ach.7e">Netherlands · International Finals</div></div>
         </article>
         <article class="mas-item" data-h="360">
-          <div class="mas-photo" style="background-image:url(&quot;assets/ach-4.jpg&quot;)"></div>
+          <div class="mas-photo" style="background-image:url(&quot;assets/ach-4.jpg?v=1&quot;);background-image:image-set(url(&quot;assets/ach-4.avif?v=1&quot;) type(&quot;image/avif&quot;), url(&quot;assets/ach-4.webp?v=1&quot;) type(&quot;image/webp&quot;), url(&quot;assets/ach-4.jpg?v=1&quot;) type(&quot;image/jpeg&quot;))"></div>
           <div class="mas-body"><span class="ach-tag" data-i18n="ach.silver2">Silver</span><h3 class="ach-title" data-i18n="ach.8t">Fibonacci International Olympiad</h3><div class="ach-event" data-i18n="ach.8e">Kazakhstan · Multiple 2nd Places</div></div>
         </article>
         <article class="mas-item" data-h="260">
-          <div class="mas-photo" style="background-image:url(&quot;assets/ach-5.jpg&quot;)"></div>
+          <div class="mas-photo" style="background-image:url(&quot;assets/ach-5.jpg?v=1&quot;);background-image:image-set(url(&quot;assets/ach-5.avif?v=1&quot;) type(&quot;image/avif&quot;), url(&quot;assets/ach-5.webp?v=1&quot;) type(&quot;image/webp&quot;), url(&quot;assets/ach-5.jpg?v=1&quot;) type(&quot;image/jpeg&quot;))"></div>
           <div class="mas-body"><span class="ach-tag" data-i18n="ach.multi">Multiple Awards</span><h3 class="ach-title" data-i18n="ach.9t">Astana Tech Cup & JasSkills</h3><div class="ach-event" data-i18n="ach.9e">Kazakhstan · 4 Prize Places · Drone Soccer Top 5</div></div>
         </article>
     </div>
@@ -1871,7 +1883,7 @@
     <div class="foot-grid stagger">
       <div>
         <a href="#hero" class="logo">
-          <img src="assets/logo-light.png?v=2" alt="SmartHub Robotics &amp; Drone Academy" width="900" height="372">
+          <picture class="pic"><source type="image/webp" srcset="assets/logo-light-450.webp?v=2 450w, assets/logo-light.webp?v=2 900w" sizes="126px"><img src="assets/logo-light.png?v=2" srcset="assets/logo-light-450.png?v=2 450w, assets/logo-light.png?v=2 900w" sizes="126px" alt="SmartHub Robotics &amp; Drone Academy" width="900" height="372" loading="lazy" decoding="async"></picture>
         </a>
         <p class="foot-brand-desc" data-i18n="foot.desc">Kazakhstan's first robotics and drone academy. Developing tomorrow's engineers through hands-on learning and international competition since 2017.</p>
         <div class="foot-contact">
@@ -2758,25 +2770,53 @@
     document.head.appendChild(js);
   }
 
-  if (!MAP_KEY) { initLeaflet(); return; }   // no 2GIS key → open map with all pins
+  function start() {
+    if (!MAP_KEY) { initLeaflet(); return; }   // no 2GIS key → open map with all pins
 
-  var sc = document.createElement('script');
-  sc.src = 'https://mapgl.2gis.com/api/js/v1';
-  sc.async = true;
-  sc.onerror = initLeaflet;   // 2GIS unreachable → open map instead
-  sc.onload = function () {
-    if (!window.mapgl) return;
-    try {
-      glHost.hidden = false;
-      gl = new mapgl.Map(glHost, { center: CENTER, zoom: 11, key: MAP_KEY });
-      BRANCHES.forEach(function (b) {
-        if (!b.coords) return;
-        new mapgl.Marker(gl, { coordinates: b.coords, label: { text: b.name } });
-      });
-      liveHost.style.display = 'none';             // 2GIS took over
-    } catch (err) { glHost.hidden = true; liveHost.style.display = ''; initLeaflet(); }
-  };
-  document.head.appendChild(sc);
+    var sc = document.createElement('script');
+    sc.src = 'https://mapgl.2gis.com/api/js/v1';
+    sc.async = true;
+    sc.onerror = initLeaflet;   // 2GIS unreachable → open map instead
+    sc.onload = function () {
+      if (!window.mapgl) return;
+      try {
+        glHost.hidden = false;
+        gl = new mapgl.Map(glHost, { center: CENTER, zoom: 11, key: MAP_KEY });
+        BRANCHES.forEach(function (b) {
+          if (!b.coords) return;
+          new mapgl.Marker(gl, { coordinates: b.coords, label: { text: b.name } });
+        });
+        liveHost.style.display = 'none';             // 2GIS took over
+      } catch (err) { glHost.hidden = true; liveHost.style.display = ''; initLeaflet(); }
+    };
+    document.head.appendChild(sc);
+  }
+
+  // The map is far down the page: fetch the library and the tiles only
+  // when the visitor gets close, not on every page view.
+  if ('IntersectionObserver' in window) {
+    var near = new IntersectionObserver(function (es) {
+      if (es[0].isIntersecting) { near.disconnect(); start(); }
+    }, { rootMargin: '800px 0px' });
+    near.observe(liveHost.parentNode || liveHost);
+  } else {
+    start();
+  }
+})();
+</script>
+
+<!-- Lazy backgrounds: photos of [data-lazy-bg] sections load once the
+     section is within 1200px of the viewport (CSS hides them until
+     .bg-on). Without JS the .js class is absent and they load as usual. -->
+<script>
+(function () {
+  var els = [].slice.call(document.querySelectorAll('[data-lazy-bg]'));
+  function on(el) { el.classList.add('bg-on'); }
+  if (!('IntersectionObserver' in window)) { els.forEach(on); return; }
+  var io = new IntersectionObserver(function (es) {
+    es.forEach(function (e) { if (e.isIntersecting) { on(e.target); io.unobserve(e.target); } });
+  }, { rootMargin: '1200px 0px' });
+  els.forEach(function (el) { io.observe(el); });
 })();
 </script>
 
@@ -2853,18 +2893,6 @@
   window.addEventListener('load', layout);
   if (window.ResizeObserver) new ResizeObserver(layout).observe(root);
 
-  // background images change the tile's look, not its size, but wait for
-  // them anyway so the first paint is not a grid of empty boxes
-  var urls = items.map(function (el) {
-    var m = /url\(["']?(.*?)["']?\)/.exec(el.querySelector('.mas-photo').style.backgroundImage);
-    return m && m[1];
-  }).filter(Boolean);
-  var left = urls.length;
-  urls.forEach(function (u) {
-    var img = new Image();
-    img.onload = img.onerror = function () { if (--left === 0) layout(); };
-    img.src = u;
-  });
 })();
 </script>
 
