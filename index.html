@@ -2406,6 +2406,27 @@
 </script>
 
 <!-- ══════════════════════════════════════════════════════════════════
+     Hero intro → Largest Contentful Paint. The logo, title and button
+     fade in from opacity 0 on the compositor; Chrome skips elements that
+     are invisible when painted and never sees them again unless something
+     repaints them, so with nothing else repainting the hero (fonts already
+     there, rings still) LCP went missing — Lighthouse: NO_LCP. Dropping a
+     finished intro animation leaves the same final look (opacity 1, no
+     transform) and repaints the element once, so it is reported as soon as
+     it is fully shown.
+     ══════════════════════════════════════════════════════════════════ -->
+<script>
+(function () {
+  var stage = document.querySelector('.hero-stage');
+  if (!stage) return;
+  var INTRO = { heroLogoIn: 1, heroSlideDown: 1, heroFadeUp: 1 };
+  stage.addEventListener('animationend', function (e) {
+    if (INTRO[e.animationName]) e.target.style.animation = 'none';
+  });
+})();
+</script>
+
+<!-- ══════════════════════════════════════════════════════════════════
      First-view chrome: the header stays out of the way until the
      visitor scrolls off the hero, so the landing opens on the hero
      alone. Also a scroll fallback for the reveal animations in case
