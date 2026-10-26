@@ -2200,10 +2200,12 @@
     hoverScale: 1.06, parallax: 0.04, clickBurst: false
   };
 
-  // failIfMajorPerformanceCaveat: no context when WebGL would run in software
-  // (no GPU, blocklisted driver). There every frame of the shader costs the
-  // main thread hundreds of milliseconds, so such devices get one still frame
-  // — the same fallback as prefers-reduced-motion below.
+  // WebGL without a GPU (blocklisted driver, VM, remote desktop) renders the
+  // shader on the CPU: every frame then costs the main thread hundreds of
+  // milliseconds and the page stops responding. Such devices get one still
+  // frame — the same fallback as prefers-reduced-motion below. Browsers
+  // refuse failIfMajorPerformanceCaveat for some of them; Chrome's
+  // SwiftShader is not refused, so the renderer name is checked as well.
   var gl = null, software = false;
   try {
     var attrs = { alpha: true, antialias: false, premultipliedAlpha: false, failIfMajorPerformanceCaveat: true };
@@ -2215,6 +2217,11 @@
     }
   } catch (e) { return; }
   if (!gl) return;
+  try {
+    var info = gl.getExtension('WEBGL_debug_renderer_info');
+    var renderer = String(gl.getParameter(info ? info.UNMASKED_RENDERER_WEBGL : gl.RENDERER) || '');
+    if (/swiftshader|llvmpipe|softpipe|software|basic render/i.test(renderer)) software = true;
+  } catch (e) { /* unknown renderer: keep the animation */ }
 
   var VS = 'attribute vec2 aPos;void main(){gl_Position=vec4(aPos,0.0,1.0);}';
 
