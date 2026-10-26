@@ -1,6 +1,6 @@
 // Public endpoint the landing-page forms post to.
 import crypto from 'node:crypto';
-import { addLead, recentFromIp, isDuplicate, dbConfigured, clientIp, hashIp, sameOrigin } from '../lib/store.js';
+import { addLead, spamCheck, dbConfigured, clientIp, hashIp, sameOrigin } from '../lib/store.js';
 import { sendToBitrix } from '../lib/bitrix.js';
 
 const LIMIT = 4000;        // bytes of JSON we are willing to read
@@ -66,8 +66,9 @@ export default async function handler(req, res) {
   // Both checks also run against the in-memory store when there is no
   // database, so local runs behave like production.
   try {
-    if (await isDuplicate(ipHash, phone)) return quiet();       // double-clicked submit
-    if (await recentFromIp(ipHash) >= MAX_PER_HOUR) {
+    const { duplicate, recent } = await spamCheck(ipHash, phone);
+    if (duplicate) return quiet();                               // double-clicked submit
+    if (recent >= MAX_PER_HOUR) {
       return res.status(429).json({ ok: false, error: 'too_many_requests' });
     }
   } catch (err) {
