@@ -173,7 +173,7 @@
       .then(function (x) {
         if (x.d.ok) { document.getElementById('pw').value = ''; show(true); return; }
         err.textContent = x.s === 429 ? 'Слишком много попыток. Подождите 15 минут.'
-          : x.d.error === 'admin_password_not_set' ? 'На сервере не задан ADMIN_PASSWORD.'
+          : (x.d.error === 'admin_not_configured' || x.d.error === 'admin_password_not_set') ? 'На сервере не задан ADMIN_PASSWORD.'
           : 'Неверный пароль.';
       })
       .catch(() => { err.textContent = 'Сервер недоступен.'; });

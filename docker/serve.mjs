@@ -26,7 +26,7 @@ const headerRules = (vercel.headers || []).map((rule) => ({
 }));
 
 const API = {};
-for (const name of ['lead', 'leads', 'login']) {
+for (const name of ['health', 'lead', 'leads', 'login']) {
   API[name] = (await import(join(ROOT, 'api', `${name}.js`))).default;
 }
 
