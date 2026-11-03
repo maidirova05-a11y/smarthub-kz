@@ -23,6 +23,7 @@
   .dot.off{background:var(--text-3)}
   .muted{color:var(--text-3);font-size:13px;font-weight:300}
   .grow{margin-left:auto}
+  @media (max-width:720px){.bar{flex-wrap:wrap;gap:8px 10px;padding:12px 16px}.wrap{padding:20px 16px 48px}.btn{height:34px;padding:0 12px}}
   .btn{height:38px;padding:0 16px;border:1.5px solid var(--line);border-radius:9px;
        background:#fff;font:inherit;font-size:14px;font-weight:500;cursor:pointer}
   .btn:hover{border-color:var(--red);color:var(--red)}
@@ -40,6 +41,7 @@
   input[type=search]{flex:1;min-width:180px;height:36px;padding:0 14px;border:1.5px solid var(--line);
         border-radius:999px;font:inherit;font-size:14px;outline:none}
   input[type=search]:focus{border-color:var(--red)}
+  .tscroll{overflow-x:auto}
   table{width:100%;border-collapse:collapse}
   th,td{padding:13px 12px;text-align:left;vertical-align:top;border-bottom:1.5px solid var(--line)}
   th{font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:.05em;color:var(--text-3)}
@@ -132,6 +134,7 @@
       <button class="btn" id="selClear">Снять выделение</button>
     </div>
 
+    <div class="tscroll">
     <table>
       <thead><tr>
         <th class="pick"><input type="checkbox" id="pickAll" title="Выбрать все"></th>
@@ -140,6 +143,7 @@
       </tr></thead>
       <tbody id="rows"></tbody>
     </table>
+    </div>
     <div class="empty" id="empty" hidden>Заявок пока нет.</div>
   </div>
 </div>
@@ -173,7 +177,9 @@
       .then(function (x) {
         if (x.d.ok) { document.getElementById('pw').value = ''; show(true); return; }
         err.textContent = x.s === 429 ? 'Слишком много попыток. Подождите 15 минут.'
-          : x.d.error === 'admin_password_not_set' ? 'На сервере не задан ADMIN_PASSWORD.'
+          : (x.d.error === 'admin_not_configured' || x.d.error === 'admin_password_not_set') ? 'На сервере не задан ADMIN_PASSWORD.'
+          : x.s === 503 ? 'Сервер временно недоступен. Попробуйте позже.'
+          : x.s >= 500 ? 'Ошибка сервера. Попробуйте позже.'
           : 'Неверный пароль.';
       })
       .catch(() => { err.textContent = 'Сервер недоступен.'; });

@@ -4,8 +4,10 @@ import {
   passwordMatches, issueToken, sessionCookie, clearCookie, isAuthed,
   clientIp, hashIp, sameOrigin, loginBlocked, noteLoginFailure
 } from '../lib/store.js';
+import { route, fail } from '../lib/http.js';
+import { log } from '../lib/log.js';
 
-export default async function handler(req, res) {
+export default route(['GET', 'POST', 'DELETE'], async (req, res) => {
   if (req.method === 'GET') {
     return res.status(200).json({ ok: true, authed: isAuthed(req) });
   }
@@ -13,27 +15,22 @@ export default async function handler(req, res) {
     res.setHeader('Set-Cookie', clearCookie());
     return res.status(200).json({ ok: true });
   }
-  if (req.method !== 'POST') {
-    res.setHeader('Allow', 'GET, POST, DELETE');
-    return res.status(405).json({ ok: false, error: 'method_not_allowed' });
-  }
-
   if (!process.env.ADMIN_PASSWORD) {
-    return res.status(500).json({ ok: false, error: 'admin_password_not_set' });
+    return fail(res, 503, 'admin_not_configured');
   }
 
-  if (!sameOrigin(req)) return res.status(403).json({ ok: false, error: 'bad_origin' });
+  if (!sameOrigin(req)) return fail(res, 403, 'bad_origin');
 
   // Failures are counted in the database, per address and across all of them,
   // so neither a cold start nor a botnet resets the budget.
   const ipHash = hashIp(clientIp(req));
   try {
     if (await loginBlocked(ipHash)) {
-      return res.status(429).json({ ok: false, error: 'too_many_attempts' });
+      return fail(res, 429, 'too_many_attempts');
     }
   } catch (err) {
-    console.error('login throttle check failed:', err.message);
-    return res.status(503).json({ ok: false, error: 'try_later' });
+    log.error('login throttle check failed', { rid: req.id, err });
+    return fail(res, 503, 'try_later');
   }
 
   let body = req.body;
@@ -47,11 +44,11 @@ export default async function handler(req, res) {
 
   const ok = passwordMatches(body && body.password);
   if (!ok) {
-    await noteLoginFailure(ipHash).catch(err => console.error('login failure log failed:', err.message));
-    console.warn(`admin login failed (ip ${ipHash.slice(0, 8)})`);
-    return res.status(401).json({ ok: false, error: 'wrong_password' });
+    await noteLoginFailure(ipHash).catch(err => log.error('login failure log failed', { rid: req.id, err }));
+    log.warn('admin login failed', { rid: req.id, ip: ipHash.slice(0, 8) });
+    return fail(res, 401, 'wrong_password');
   }
 
   res.setHeader('Set-Cookie', sessionCookie(issueToken()));
   return res.status(200).json({ ok: true });
-}
+});
